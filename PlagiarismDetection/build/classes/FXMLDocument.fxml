@@ -12,7 +12,6 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-
 <AnchorPane xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="FXMLDocumentController">
    <children>
       <AnchorPane id="AnchorPane" fx:id="inputScreen" prefHeight="528.0" prefWidth="624.0">
@@ -27,7 +26,7 @@
                   <Font name="Arial Black" size="33.0" />
                </font>
             </Label>
-            <TextArea layoutX="62.0" layoutY="74.0" prefHeight="170.0" prefWidth="500.0" promptText="Please insert your text here to check for plagiarism" />
+            <TextArea fx:id="plagiarismInputTextArea" layoutX="62.0" layoutY="74.0" prefHeight="170.0" prefWidth="500.0" promptText="Please insert your text here to check for plagiarism" />
             <Label layoutX="297.0" layoutY="253.0" text="OR">
                <font>
                   <Font name="Arial" size="20.0" />
@@ -44,6 +43,7 @@
                </font>
             </Button>
             <TextField layoutX="222.0" layoutY="356.0" prefHeight="25.0" prefWidth="180.0" promptText="No File Chosen" />
+            <Button fx:id="testTranslateButton" layoutX="471.0" layoutY="291.0" mnemonicParsing="false" onAction="#testTranslateButtonAction" text="test" />
           </children>
       </AnchorPane>
       <AnchorPane fx:id="selectLanguageScreen" disable="true" prefHeight="528.0" prefWidth="624.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
