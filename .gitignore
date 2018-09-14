@@ -1,2 +1,6 @@
 .vscode
-/PlagiarismDetection/nbproject/private/
+/PlagiarismDetection/src/main/resources/fxml/SceneBACKUP.fxml
+/PlagiarismDetection/target/classes
+/PlagiarismDetection/target/PlagiarismDetection-_1.0.jar
+/PlagiarismDetection/target/PlagiarismDetection-_1.0-javadoc.jar
+/PlagiarismDetection/target/PlagiarismDetection-_1.0-sources.jar
