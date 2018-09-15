@@ -1,0 +1,6 @@
+Open "Run.bat" to open the program WITHOUT console remaining on the screen.
+Open "RunDebug.bat" to open the program WITH console remaining on the screen.
+
+*NOTE: 
+	Make sure to have the serviceAccountKey.json in the same folder as the jar and the .bat file.
+	Make sure that the .bat you are trying to run has the right name of the jar in it. Just edit it if it's not.

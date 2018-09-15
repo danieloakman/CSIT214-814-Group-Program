@@ -4,7 +4,6 @@
 
 package PlagiarismDetection;
 
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.google.auth.oauth2.GoogleCredentials;

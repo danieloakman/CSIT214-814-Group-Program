@@ -21,7 +21,7 @@ public class MainApp extends Application {
         Scene scene = new Scene(root);
         scene.getStylesheets().add("/styles/Styles.css");
         
-        stage.setTitle("JavaFX and Maven");
+        stage.setTitle("Plagiarism Detector");
         stage.setScene(scene);
         stage.show();
     }
@@ -35,12 +35,6 @@ public class MainApp extends Application {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-//        Firebase.initialise();
-//        try {
-//            Firebase.createUserWithUid("some-uid2", "1234@test.com", "+12234567890");
-//        } catch (InterruptedException | ExecutionException | FirebaseAuthException ex) {
-//            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
-//        }
         launch(args);
     }
 
