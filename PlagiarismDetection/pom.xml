@@ -4,7 +4,7 @@
 
     <groupId>GroupAlpha</groupId>
     <artifactId>PlagiarismDetection</artifactId>
-    <version>_1.0</version>
+    <version>1.0</version>
     <packaging>jar</packaging>
 
     <name>PlagiarismDetection</name>
@@ -102,19 +102,29 @@
                     </additionalClasspathElements>
                 </configuration>
             </plugin>
-<!--            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
+            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.6</version>
+                <version>2.4</version>
                 <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
                     <archive>
                         <manifest>
-                            <addClasspath>${project.build.directory}/classes/PlagiarismDetection/MainApp.class</addClasspath>
-                            <mainClass>MainApp</mainClass>
+                            <mainClass>PlagiarismDetection.MainApp</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
-            </plugin>-->
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <dependencies>

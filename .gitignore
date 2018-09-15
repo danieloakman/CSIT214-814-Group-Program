@@ -4,3 +4,8 @@
 /PlagiarismDetection/target/PlagiarismDetection-_1.0.jar
 /PlagiarismDetection/target/PlagiarismDetection-_1.0-javadoc.jar
 /PlagiarismDetection/target/PlagiarismDetection-_1.0-sources.jar
+/PlagiarismDetection/target
+/PlagiarismDetection/target/maven-status
+/PlagiarismDetection/target/test-classes
+/PlagiarismDetection/target/dependency-maven-plugin-markers
+/PlagiarismDetection/target/maven-archiver
