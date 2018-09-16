@@ -1,6 +1,13 @@
+/*
+ * CSIT214/814 GROUP ALPHA
+ */
+
 package PlagiarismDetection;
 
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.UserRecord;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
@@ -12,13 +19,20 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.control.TextArea;
+import javax.script.ScriptException;
 
 public class FXMLController implements Initializable {
     
     @FXML
     private AnchorPane inputScreen;
     @FXML
+    private Button testTranslateButton;
+    @FXML
+    private TextArea inputTextArea;
+    @FXML
     private Button continueButton;
+    @FXML
+    private Button debugTestButton;
     @FXML
     private AnchorPane selectLanguageScreen;
     @FXML
@@ -28,9 +42,11 @@ public class FXMLController implements Initializable {
     @FXML
     private Button startNewCheckButton;
     @FXML
-    private TextArea inputTextArea;
+    private AnchorPane debugTestScreen;
     @FXML
-    private Button testTranslateButton;
+    private Button exitDebug;
+    @FXML
+    private Button fetchButton;
 
     @FXML
     void startNewCheckButtonAction(ActionEvent event) {
@@ -75,13 +91,33 @@ public class FXMLController implements Initializable {
         }
     }
     
+    @FXML
+    void debugButtonAction(ActionEvent event) {
+        System.out.println("Debug/test screen...");
+        inputScreen.setDisable(true);
+        inputScreen.setVisible(false);
+        debugTestScreen.setDisable(false);
+        debugTestScreen.setVisible(true);
+    }
+
+    @FXML
+    void exitDebugAction(ActionEvent event) {
+        System.out.println("Exiting debug/test screen...");
+        debugTestScreen.setDisable(true);
+        debugTestScreen.setVisible(false);
+        inputScreen.setDisable(false);
+        inputScreen.setVisible(true);
+    }
+    
+    @FXML
+    void fetchButtonAction(ActionEvent event) {
+        System.out.println("Attempting database fetch...");
+        Firebase.getDocumentFromDatabase();
+        System.out.println("Fetched...");
+    }
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         Firebase.initialise();
-        try {
-            Firebase.getUserByEmail("test@test.com");
-        } catch (InterruptedException | ExecutionException ex) {
-            Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }      
 }
