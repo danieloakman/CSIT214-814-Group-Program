@@ -14,13 +14,15 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="PlagiarismDetection.FXMLController">
    <children>
-      <AnchorPane id="AnchorPane" fx:id="inputScreen" prefHeight="528.0" prefWidth="624.0">
+      <AnchorPane id="AnchorPane" fx:id="inputScreen" disable="true" prefHeight="528.0" prefWidth="624.0" visible="false">
           <children>
             <Label layoutX="101.0" layoutY="14.0" text="PLAGIARISM CHECKER">
                <font>
                   <Font name="Arial Black" size="33.0" />
                </font>
             </Label>
+            <Button fx:id="testTranslateButton" layoutX="511.0" layoutY="273.0" mnemonicParsing="false" onAction="#testTranslateButtonAction" text="test translate" />
+            <Label layoutX="497.0" layoutY="256.0" text="USE THIS SPARINGLY" />
             <TextArea fx:id="inputTextArea" layoutX="62.0" layoutY="74.0" prefHeight="170.0" prefWidth="500.0" promptText="Please insert your text here to check for plagiarism" />
             <Label layoutX="297.0" layoutY="253.0" text="OR">
                <font>
@@ -33,8 +35,6 @@
                </font>
             </Label>
             <TextField layoutX="222.0" layoutY="356.0" prefHeight="25.0" prefWidth="180.0" promptText="No File Chosen" />
-            <Button fx:id="testTranslateButton" layoutX="477.0" layoutY="276.0" mnemonicParsing="false" onAction="#testTranslateButtonAction" text="test translate" />
-            <Label layoutX="463.0" layoutY="256.0" text="USE THIS SPARINGLY" />
             <Button fx:id="continueButton" focusTraversable="false" layoutX="258.0" layoutY="453.0" mnemonicParsing="false" onAction="#continueButtonAction" text="Continue">
                <font>
                   <Font size="20.0" />
@@ -45,6 +45,7 @@
                   <Font name="System Italic" size="15.0" />
                </font>
             </Button>
+            <Button fx:id="debugTestButton" layoutX="532.0" layoutY="14.0" mnemonicParsing="false" onAction="#debugButtonAction" text="Debug/Test" />
           </children>
       </AnchorPane>
       <AnchorPane fx:id="selectLanguageScreen" disable="true" prefHeight="528.0" prefWidth="624.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -98,6 +99,20 @@
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </padding>
             </Pane>
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="debugTestScreen" prefHeight="528.0" prefWidth="624.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Button fx:id="exitDebug" layoutX="541.0" layoutY="14.0" mnemonicParsing="false" onAction="#exitDebugAction" text="Exit debug" />
+            <TextField layoutX="14.0" layoutY="35.0" prefHeight="25.0" prefWidth="200.0" promptText="Title" />
+            <TextArea layoutX="14.0" layoutY="85.0" prefHeight="200.0" prefWidth="200.0" promptText="Text data" />
+            <Label layoutX="14.0" layoutY="18.0" text="Store in database" />
+            <TextField layoutX="14.0" layoutY="60.0" prefHeight="25.0" prefWidth="200.0" promptText="Uploader" />
+            <Button layoutX="81.0" layoutY="294.0" mnemonicParsing="false" text="Store" />
+            <TextArea layoutX="222.0" layoutY="60.0" prefHeight="226.0" prefWidth="213.0" />
+            <Label layoutX="222.0" layoutY="18.0" text="Fetch a documents from database" />
+            <Button fx:id="fetchButton" layoutX="303.0" layoutY="294.0" mnemonicParsing="false" onAction="#fetchButtonAction" text="Fetch" />
+            <TextField layoutX="222.0" layoutY="35.0" prefHeight="25.0" prefWidth="213.0" promptText="Title" />
          </children>
       </AnchorPane>
    </children>
