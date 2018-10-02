@@ -47,6 +47,19 @@ public class FXMLController implements Initializable {
     private Button exitDebug;
     @FXML
     private Button fetchButton;
+    @FXML
+    private Button searchButton;
+    @FXML
+    private TextArea searchTextArea;
+    @FXML
+    private TextArea resultsText;
+    
+    @FXML
+    void searchButtonAction(ActionEvent event){
+        String searchText = searchTextArea.getText();
+        WebSearch.start(searchText);
+        resultsText.setText(WebSearch.results);
+    }
 
     @FXML
     void startNewCheckButtonAction(ActionEvent event) {

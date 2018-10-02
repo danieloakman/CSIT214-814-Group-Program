@@ -14,10 +14,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class WebSearch {
-    static String subscriptionKey = "fff48c3e04b54199902a36e068ad615f";
+    static String subscriptionKey = "d2d8043a9b604c1380f19dbf18b16859";
     static String host = "https://api.cognitive.microsoft.com";
     static String path = "/bing/v7.0/search";
     static String searchTerm;
+    static String results = "";
     
     public static WebResults Search(String term) throws Exception {
         URL url = new URL(host + path + "?q=" +  URLEncoder.encode(term, "UTF-8"));
@@ -60,8 +61,8 @@ public class WebSearch {
             WebResults result = Search(searchTxt);
             
             for(String header : result.relavantHeaders.keySet()){
-                System.out.println(header + ": " + result.relavantHeaders.get(header));
-                System.out.println(parse(result.jsonResponse));
+                results = results.concat(header + ": " + result.relavantHeaders.get(header));
+                results = results.concat(parse(result.jsonResponse));
             }
         }
         catch(Exception e){
