@@ -58,6 +58,7 @@ public class FXMLController implements Initializable {
     void searchButtonAction(ActionEvent event){
         String searchText = searchTextArea.getText();
         WebSearch.start(searchText);
+        ArrayList<ResultCompare> display = new ArrayList<>();
         resultsText.setText(WebSearch.results);
     }
 
