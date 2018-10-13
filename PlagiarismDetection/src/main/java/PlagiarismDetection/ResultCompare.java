@@ -20,6 +20,11 @@ public class ResultCompare {
         this.percent = (titlePercent + contentPercent) / 2;
     }
     
+    /*
+    The algorithm below was translated from a C# algorithm that can be found at
+    https://stackoverflow.com/questions/16840503/how-to-compare-2-strings-and-find-the-difference-in-percentage
+    */
+    
     static double calcPercent(String content){
         double percentContent = 0;
         String comparativeContent = "";
