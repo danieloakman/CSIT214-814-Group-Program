@@ -14,7 +14,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class WebSearch {
-    static String subscriptionKey = "d2d8043a9b604c1380f19dbf18b16859";
+    static String subscriptionKey = "cd19e4797ef14c9984899ea5e09bf2b6";
     static String host = "https://api.cognitive.microsoft.com";
     static String path = "/bing/v7.0/search";
     static String searchTerm;

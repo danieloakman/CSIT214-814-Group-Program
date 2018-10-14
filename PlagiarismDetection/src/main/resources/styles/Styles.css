@@ -1,3 +1,15 @@
-/*.button {
-    -fx-font-weight: bold;
-}*/
+.infoPane {
+    -fx-border-color: grey;
+    -fx-border-radius: 15;
+}
+
+.signInButtons {
+    -fx-border-color: grey;
+    -fx-border-radius: 2;
+    -fx-background-color: #f5f5f5;
+}
+
+.errorLabel {
+    font-size: medium;
+    font-family: monospace;
+}

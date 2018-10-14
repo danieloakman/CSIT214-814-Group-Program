@@ -24,7 +24,7 @@ import com.google.gson.JsonParser;
 
 public class MicrosoftTextTranslate {
 // Replace the subscriptionKey string value with your valid subscription key.
-    static String subscriptionKey = "fff48c3e04b54199902a36e068ad615f";
+    static String subscriptionKey = "fcbbf8e698214b7183d45dc5c7938739";
 
     static String host = "https://api.cognitive.microsofttranslator.com";
     static String path = "/translate?api-version=3.0";

@@ -4,11 +4,7 @@
 
 package PlagiarismDetection;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
+import com.google.api.core.ApiFuture;
 import com.google.firebase.auth.ExportedUserRecord;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
@@ -17,28 +13,45 @@ import com.google.firebase.auth.ListUsersPage;
 import com.google.firebase.auth.UserRecord;
 import com.google.firebase.auth.UserRecord.CreateRequest;
 import com.google.firebase.auth.UserRecord.UpdateRequest;
-import com.google.firebase.database.*;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.QueryDocumentSnapshot;
+import com.google.cloud.firestore.QuerySnapshot;
+import com.google.cloud.firestore.WriteResult;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.cloud.FirestoreClient;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.commons.validator.routines.EmailValidator;
 
 public class Firebase {
+    static public Firestore db;
+    static public User currentUser = new User();
+    static public boolean loggedIn = false;
     static public void initialise (){
         try {
             FileInputStream serviceAccount = new FileInputStream("serviceAccountKey.json");
             FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-    //          .setServiceAccountId("firebase-adminsdk-x0na7@csit314-814-group-project.iam.gserviceaccount.com")
-                .setDatabaseUrl("https://csit314-814-group-project.firebaseio.com/")
+//                .setServiceAccountId("firebase-adminsdk-x0na7@csit314-814-group-project.iam.gserviceaccount.com")
+//                .setDatabaseUrl("https://csit314-814-group-project.firebaseio.com/")
                 .build();
             FirebaseApp.initializeApp(options);
-            System.out.println("Successfully initialised FirebaseApp.");
+            db = FirestoreClient.getFirestore();
+            
+            System.out.println("Successfully initialised Firebase.");
         } catch (IOException ex) {
             System.err.println("Firebase.initialise() error: " + ex.getMessage());
         }
@@ -51,6 +64,10 @@ public class Firebase {
             .setEmail(email)
             .setPassword(password);
         FirebaseAuth.getInstance().createUserAsync(request).get();
+    }
+    
+    static public boolean isEmailValid (String email) {
+        return EmailValidator.getInstance().isValid(email);
     }
     
     static public void deleteUserByEmail (String email) throws InterruptedException, ExecutionException {
@@ -81,52 +98,64 @@ public class Firebase {
         return userRecordList;
     }
     
-    /*
-    * A Custom token is used for signing in a user later
-    */
-    static public String getCustomTokenByEmail(String email) throws InterruptedException, ExecutionException, FirebaseAuthException {
-        return FirebaseAuth.getInstance().createCustomToken(getUserByEmail(email).getUid());
-    }
-    
-    static public void signIn (String email, String password) throws InterruptedException, ExecutionException, FirebaseAuthException {
-        String customToken = getCustomTokenByEmail(email);
-        FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(customToken);
-        System.out.println(decodedToken.toString());
+    static public boolean signIn (String email, String password) throws InterruptedException, ExecutionException {
+        DocumentReference docRef = db.collection("Users").document(email);
+        // asynchronously retrieve the document
+        ApiFuture<DocumentSnapshot> future = docRef.get();
+        // ...
+        // future.get() blocks on response
+        DocumentSnapshot document = future.get();
+        if (document.exists()) {
+            Map<String, Object> data = document.getData();
+            String passwordToMatch = data.get("password").toString();
+            if (passwordToMatch.equals(password))
+                return true;
+        } else {
+            System.out.println("No such document!");
+            return false;
+        }
+        return false;
     }
     
     static public void storeDocumentInDatabase (String documentText, String nameOfUploader, String title) {
-        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
-        
-        // add a document to Documents tree
         Document doc = new Document(title, dtf.format(now), documentText, nameOfUploader);
-        dbRef.child("Documents").push().setValueAsync(doc);
-        
-        // add name of document to user's tree
-//        Map<String, Object> data = new HashMap();
-//        data.put("Document title", nameOfDocument);
-//        dbRef.child("Users/" + nameOfUploader + "/Uploaded Documents").push().updateChildrenAsync(data);
+        ApiFuture<DocumentReference> addedDocRef = db.collection("Documents").add(doc);
+        try {
+            System.out.println("Added document with ID: " + addedDocRef.get().getId());
+        } catch (InterruptedException | ExecutionException ex) {
+            Logger.getLogger(Firebase.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
-	/*
-	* Doesn't work yet.
-	*/
+    /*
+    *   For signing in the user later.
+    */
+    static public void storePasswordInDatabase (String email, String password) {
+        HashMap<String, String> data = new HashMap<>();
+        data.put("password", password);
+        db.collection("Users").document(email).set(data);
+        System.out.println("Successfully stored email and password in database.");
+    }
+    
+    /*
+    * Doesn't work yet.
+    */
     static public void getDocumentFromDatabase () {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Documents");
-
-        ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-              Document doc = dataSnapshot.getValue(Document.class);
-              System.out.println(doc);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-              System.out.println("The read failed: " + databaseError.getCode());
-            }
-        });
+        //asynchronously retrieve all documents
+        ApiFuture<QuerySnapshot> future = db.collection("Documents").get();
+        // future.get() blocks on response
+        List<QueryDocumentSnapshot> documents = null;
+        try {
+            documents = future.get().getDocuments();
+        } catch (InterruptedException | ExecutionException ex) {
+            Logger.getLogger(Firebase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        for (QueryDocumentSnapshot document : documents) {
+            System.out.println(document.getId());
+            System.out.println(document.getData());
+        }
     }
 }
 
@@ -136,10 +165,23 @@ class Document {
     public String uploader;
     public String title;
 
-    public Document(String title ,String timeOfUpload, String text, String uploader) {
+    public Document (String title ,String timeOfUpload, String text, String uploader) {
         this.title = title;
         this.timeOfUpload = timeOfUpload;
         this.text = text;
         this.uploader = uploader;
+    }
+}
+
+class User {
+    public String email;
+    public String password;
+    public User () {
+        email = "";
+        password = "";
+    }
+    public User (String email, String password) {
+        this.email = email;
+        this.password = password;
     }
 }

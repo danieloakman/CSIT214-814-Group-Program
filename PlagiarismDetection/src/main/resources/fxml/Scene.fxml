@@ -6,46 +6,50 @@
 <?import javafx.scene.control.ContextMenu?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="PlagiarismDetection.FXMLController">
+<AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="PlagiarismDetection.FXMLController">
    <children>
-      <AnchorPane id="AnchorPane" fx:id="inputScreen" prefHeight="528.0" prefWidth="624.0">
+      <AnchorPane id="AnchorPane" fx:id="inputScreen" disable="true" prefHeight="720.0" prefWidth="1280.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
           <children>
-            <Label layoutX="101.0" layoutY="14.0" text="PLAGIARISM CHECKER">
+            <Label layoutX="429.0" layoutY="14.0" text="PLAGIARISM CHECKER">
                <font>
                   <Font name="Arial Black" size="33.0" />
                </font>
             </Label>
-            <Button fx:id="testTranslateButton" layoutX="511.0" layoutY="273.0" mnemonicParsing="false" onAction="#testTranslateButtonAction" text="test translate" />
-            <Label layoutX="497.0" layoutY="256.0" text="USE THIS SPARINGLY" />
-            <TextArea fx:id="inputTextArea" layoutX="62.0" layoutY="74.0" prefHeight="170.0" prefWidth="500.0" promptText="Please insert your text here to check for plagiarism" />
-            <Label layoutX="297.0" layoutY="253.0" text="OR">
+            <Button fx:id="testTranslateButton" layoutX="1079.0" layoutY="346.0" mnemonicParsing="false" onAction="#testTranslateButtonAction" text="test translate" />
+            <Label layoutX="1065.0" layoutY="329.0" text="USE THIS SPARINGLY" />
+            <TextArea fx:id="inputTextArea" layoutX="390.0" layoutY="94.0" prefHeight="170.0" prefWidth="500.0" promptText="Please insert your text here to check for plagiarism" />
+            <Label layoutX="625.0" layoutY="273.0" text="OR">
                <font>
                   <Font name="Arial" size="20.0" />
                </font>
             </Label>
-            <Label layoutX="234.0" layoutY="293.0" text="UPLOAD A DOCUMENT">
+            <Label layoutX="562.0" layoutY="313.0" text="UPLOAD A DOCUMENT">
                <font>
                   <Font size="15.0" />
                </font>
             </Label>
-            <TextField layoutX="222.0" layoutY="356.0" prefHeight="25.0" prefWidth="180.0" promptText="No File Chosen" />
-            <Button fx:id="continueButton" focusTraversable="false" layoutX="258.0" layoutY="453.0" mnemonicParsing="false" onAction="#continueButtonAction" text="Continue">
+            <TextField layoutX="550.0" layoutY="376.0" prefHeight="25.0" prefWidth="180.0" promptText="No File Chosen" />
+            <Button fx:id="continueButton" focusTraversable="false" layoutX="586.0" layoutY="473.0" mnemonicParsing="false" onAction="#continueButtonAction" text="Continue">
                <font>
                   <Font size="20.0" />
                </font>
             </Button>
-            <Button layoutX="279.0" layoutY="397.0" mnemonicParsing="false" text="Upload">
+            <Button layoutX="607.0" layoutY="417.0" mnemonicParsing="false" text="Upload">
                <font>
                   <Font name="System Italic" size="15.0" />
                </font>
             </Button>
-            <Button fx:id="debugTestButton" layoutX="532.0" layoutY="14.0" mnemonicParsing="false" onAction="#debugButtonAction" text="Debug/Test" />
+            <Button fx:id="debugTestButton" layoutX="1188.0" layoutY="14.0" mnemonicParsing="false" onAction="#debugButtonAction" text="Debug/Test" />
+            <Button fx:id="inputScreenSignOutButton" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#inputScreenSignOutButtonAction" text="Sign out" />
           </children>
       </AnchorPane>
       <AnchorPane fx:id="selectLanguageScreen" disable="true" prefHeight="528.0" prefWidth="624.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -108,7 +112,7 @@
             <TextArea layoutX="14.0" layoutY="85.0" prefHeight="200.0" prefWidth="200.0" promptText="Text data" />
             <Label layoutX="14.0" layoutY="18.0" text="Store in database" />
             <TextField layoutX="14.0" layoutY="60.0" prefHeight="25.0" prefWidth="200.0" promptText="Uploader" />
-            <Button layoutX="81.0" layoutY="294.0" mnemonicParsing="false" text="Store" />
+            <Button fx:id="storeButton" layoutX="81.0" layoutY="294.0" mnemonicParsing="false" onAction="#storeButtonAction" text="Store" />
             <TextArea layoutX="222.0" layoutY="60.0" prefHeight="226.0" prefWidth="213.0" />
             <Label layoutX="222.0" layoutY="18.0" text="Fetch a documents from database" />
             <Button fx:id="fetchButton" layoutX="303.0" layoutY="294.0" mnemonicParsing="false" onAction="#fetchButtonAction" text="Fetch" />
@@ -117,6 +121,110 @@
             <Label layoutX="14.0" layoutY="336.0" text="Search With Bing" />
             <TextArea fx:id="searchTextArea" layoutX="14.0" layoutY="353.0" prefHeight="118.0" prefWidth="364.0" promptText="Search Text" />
             <TextArea fx:id="resultsText" editable="false" layoutX="402.0" layoutY="307.0" prefHeight="200.0" prefWidth="200.0" />
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="loginScreen" prefHeight="528.0" prefWidth="827.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Label layoutX="299.0" layoutY="25.0" text="The best plagiarism checker that you'll ever need">
+               <font>
+                  <Font name="Corbel" size="34.0" />
+               </font>
+            </Label>
+            <ImageView fitHeight="551.0" fitWidth="628.0" layoutX="34.0" layoutY="100.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../images/blur-book-stack-books-590493.jpg" />
+               </image>
+            </ImageView>
+            <AnchorPane fx:id="accountLogInOrSignUpPane" layoutX="659.0" layoutY="103.0" prefHeight="551.0" prefWidth="596.0">
+               <children>
+                  <Button fx:id="goToCreateAccountButton" alignment="CENTER" layoutX="116.0" layoutY="197.0" mnemonicParsing="false" onAction="#goToCreateAccountButtonAction" prefHeight="39.0" prefWidth="364.0" text="Sign up with any email" textAlignment="CENTER">
+                     <font>
+                        <Font name="Corbel" size="20.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="goToSignInButton" alignment="CENTER" layoutX="116.0" layoutY="348.0" mnemonicParsing="false" onAction="#goToSignInButtonAction" prefHeight="39.0" prefWidth="364.0" text="Sign in">
+                     <font>
+                        <Font name="Corbel" size="20.0" />
+                     </font>
+                  </Button>
+                  <Label layoutX="220.0" layoutY="321.0" text="Already have an account?">
+                     <font>
+                        <Font name="Corbel" size="15.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="134.0" layoutY="165.0" text="In order to use our services, you need an account.">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
+               </children>
+            </AnchorPane>
+            <AnchorPane fx:id="createAccountPane" disable="true" layoutX="659.0" layoutY="103.0" prefHeight="551.0" prefWidth="596.0" visible="false">
+               <children>
+                  <TextField fx:id="createAccountEmailField" layoutX="138.0" layoutY="197.0" prefHeight="44.0" prefWidth="320.0" promptText="Email: johnsmith@gmail.com">
+                     <font>
+                        <Font name="Corbel" size="20.0" />
+                     </font>
+                  </TextField>
+                  <PasswordField fx:id="createAccountPasswordField" layoutX="138.0" layoutY="254.0" prefHeight="44.0" prefWidth="320.0" promptText="Password: minimum of 6 characters">
+                     <font>
+                        <Font name="Corbel" size="20.0" />
+                     </font>
+                  </PasswordField>
+                  <Button fx:id="createAccountButton" defaultButton="true" layoutX="200.0" layoutY="319.0" mnemonicParsing="false" onAction="#createAccountButtonAction" text="Create account and sign in">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="createAccountBackButton" cancelButton="true" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#createAccountBackButton" prefHeight="17.0" prefWidth="44.0" text="Back" />
+                  <Label layoutX="132.0" layoutY="364.0" text="By creating an acount, you agree to the ">
+                     <font>
+                        <Font name="Corbel" size="14.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="231.0" layoutY="389.0" text="View our Privacy Policy" underline="true">
+                     <font>
+                        <Font name="Corbel" size="14.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="363.0" layoutY="364.0" text="Terms of Service." underline="true">
+                     <font>
+                        <Font name="Corbel" size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="createAccountErrorLabel" layoutX="138.0" layoutY="438.0" prefHeight="40.0" prefWidth="320.0" styleClass="errorLabel" textAlignment="CENTER" textFill="RED">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
+               </children>
+            </AnchorPane>
+            <AnchorPane fx:id="signInPane" disable="true" layoutX="669.0" layoutY="113.0" prefHeight="551.0" prefWidth="596.0" visible="false">
+               <children>
+                  <TextField fx:id="signInEmailField" layoutX="138.0" layoutY="186.0" prefHeight="31.0" prefWidth="320.0" promptText="Email">
+                     <font>
+                        <Font name="Corbel" size="20.0" />
+                     </font>
+                  </TextField>
+                  <PasswordField fx:id="signInPasswordField" layoutX="138.0" layoutY="241.0" prefHeight="31.0" prefWidth="320.0" promptText="Password">
+                     <font>
+                        <Font name="Corbel" size="20.0" />
+                     </font>
+                  </PasswordField>
+                  <Button fx:id="signInButton" defaultButton="true" layoutX="265.0" layoutY="295.0" mnemonicParsing="false" onAction="#signInButtonAction" text="Sign in">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="signInBackButton" cancelButton="true" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#signInBackButtonAction" prefHeight="17.0" prefWidth="44.0" text="Back" />
+                  <Label fx:id="signInErrorLabel" layoutX="140.0" layoutY="394.0" prefHeight="33.0" prefWidth="320.0" styleClass="errorLabel" textFill="RED">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="240.0" layoutY="348.0" text="Forgot your password?" underline="true" />
+               </children>
+            </AnchorPane>
          </children>
       </AnchorPane>
    </children>
