@@ -9,6 +9,7 @@
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -161,22 +162,28 @@
             </AnchorPane>
             <AnchorPane fx:id="createAccountPane" disable="true" layoutX="659.0" layoutY="103.0" prefHeight="551.0" prefWidth="596.0" visible="false">
                <children>
-                  <TextField fx:id="createAccountEmailField" layoutX="138.0" layoutY="197.0" prefHeight="44.0" prefWidth="320.0" promptText="Email: johnsmith@gmail.com">
+                  <Button fx:id="createAccountBackButton" cancelButton="true" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#createAccountBackButton" prefHeight="17.0" prefWidth="44.0" text="Back" />
+                  <TextField fx:id="createAccountEmailField" layoutX="138.0" layoutY="197.0" prefHeight="44.0" prefWidth="320.0" promptText="Email">
                      <font>
                         <Font name="Corbel" size="20.0" />
                      </font>
+                     <tooltip>
+                        <Tooltip text="E.g. johnsmith@gmail.com" />
+                     </tooltip>
                   </TextField>
-                  <PasswordField fx:id="createAccountPasswordField" layoutX="138.0" layoutY="254.0" prefHeight="44.0" prefWidth="320.0" promptText="Password: minimum of 6 characters">
+                  <PasswordField fx:id="createAccountPasswordField" layoutX="138.0" layoutY="254.0" prefHeight="44.0" prefWidth="320.0" promptText="Password">
                      <font>
                         <Font name="Corbel" size="20.0" />
                      </font>
+                     <tooltip>
+                        <Tooltip text="Must be at least 6 characters long." />
+                     </tooltip>
                   </PasswordField>
                   <Button fx:id="createAccountButton" defaultButton="true" layoutX="200.0" layoutY="319.0" mnemonicParsing="false" onAction="#createAccountButtonAction" text="Create account and sign in">
                      <font>
                         <Font size="15.0" />
                      </font>
                   </Button>
-                  <Button fx:id="createAccountBackButton" cancelButton="true" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#createAccountBackButton" prefHeight="17.0" prefWidth="44.0" text="Back" />
                   <Label layoutX="132.0" layoutY="364.0" text="By creating an acount, you agree to the ">
                      <font>
                         <Font name="Corbel" size="14.0" />
@@ -197,32 +204,51 @@
                         <Font size="15.0" />
                      </font>
                   </Label>
+                  <ImageView fx:id="createAccountLoadingGif" fitHeight="37.0" fitWidth="44.0" layoutX="414.0" layoutY="316.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@../images/loading-blue.gif" />
+                     </image>
+                  </ImageView>
                </children>
             </AnchorPane>
             <AnchorPane fx:id="signInPane" disable="true" layoutX="669.0" layoutY="113.0" prefHeight="551.0" prefWidth="596.0" visible="false">
                <children>
+                  <Button fx:id="signInBackButton" cancelButton="true" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#signInBackButtonAction" prefHeight="17.0" prefWidth="44.0" text="Back" />
                   <TextField fx:id="signInEmailField" layoutX="138.0" layoutY="186.0" prefHeight="31.0" prefWidth="320.0" promptText="Email">
                      <font>
                         <Font name="Corbel" size="20.0" />
                      </font>
+                     <tooltip>
+                        <Tooltip text="E.g. johnsmith@gmail.com" />
+                     </tooltip>
                   </TextField>
                   <PasswordField fx:id="signInPasswordField" layoutX="138.0" layoutY="241.0" prefHeight="31.0" prefWidth="320.0" promptText="Password">
                      <font>
                         <Font name="Corbel" size="20.0" />
                      </font>
+                     <tooltip>
+                        <Tooltip text="Must be atleast 6 character long." />
+                     </tooltip>
                   </PasswordField>
                   <Button fx:id="signInButton" defaultButton="true" layoutX="265.0" layoutY="295.0" mnemonicParsing="false" onAction="#signInButtonAction" text="Sign in">
                      <font>
                         <Font size="15.0" />
                      </font>
                   </Button>
-                  <Button fx:id="signInBackButton" cancelButton="true" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#signInBackButtonAction" prefHeight="17.0" prefWidth="44.0" text="Back" />
                   <Label fx:id="signInErrorLabel" layoutX="140.0" layoutY="394.0" prefHeight="33.0" prefWidth="320.0" styleClass="errorLabel" textFill="RED">
                      <font>
                         <Font size="15.0" />
                      </font>
                   </Label>
-                  <Label layoutX="240.0" layoutY="348.0" text="Forgot your password?" underline="true" />
+                  <Label layoutX="240.0" layoutY="348.0" text="Forgot your password?" underline="true">
+                     <tooltip>
+                        <Tooltip text="Contact an administrator." />
+                     </tooltip></Label>
+                  <ImageView fx:id="signInLoadingGif" fitHeight="37.0" fitWidth="44.0" layoutX="344.0" layoutY="292.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@../images/loading-blue.gif" />
+                     </image>
+                  </ImageView>
                </children>
             </AnchorPane>
          </children>

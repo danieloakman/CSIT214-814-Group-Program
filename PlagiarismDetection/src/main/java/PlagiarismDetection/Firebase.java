@@ -102,16 +102,16 @@ public class Firebase {
         DocumentReference docRef = db.collection("Users").document(email);
         // asynchronously retrieve the document
         ApiFuture<DocumentSnapshot> future = docRef.get();
-        // ...
-        // future.get() blocks on response
         DocumentSnapshot document = future.get();
         if (document.exists()) {
             Map<String, Object> data = document.getData();
             String passwordToMatch = data.get("password").toString();
-            if (passwordToMatch.equals(password))
+            if (passwordToMatch.equals(password)) {
+                System.out.println("Password matches!");
                 return true;
+            }
         } else {
-            System.out.println("No such document!");
+            System.out.println("No such user!");
             return false;
         }
         return false;
