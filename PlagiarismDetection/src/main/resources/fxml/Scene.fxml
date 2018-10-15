@@ -7,9 +7,11 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.TreeView?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -18,115 +20,9 @@
 
 <AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="PlagiarismDetection.FXMLController">
    <children>
-      <AnchorPane id="AnchorPane" fx:id="inputScreen" disable="true" prefHeight="720.0" prefWidth="1280.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-          <children>
-            <Label layoutX="429.0" layoutY="14.0" text="PLAGIARISM CHECKER">
-               <font>
-                  <Font name="Arial Black" size="33.0" />
-               </font>
-            </Label>
-            <Button fx:id="testTranslateButton" layoutX="1079.0" layoutY="346.0" mnemonicParsing="false" onAction="#testTranslateButtonAction" text="test translate" />
-            <Label layoutX="1065.0" layoutY="329.0" text="USE THIS SPARINGLY" />
-            <TextArea fx:id="inputTextArea" layoutX="390.0" layoutY="94.0" prefHeight="170.0" prefWidth="500.0" promptText="Please insert your text here to check for plagiarism" />
-            <Label layoutX="625.0" layoutY="273.0" text="OR">
-               <font>
-                  <Font name="Arial" size="20.0" />
-               </font>
-            </Label>
-            <Label layoutX="562.0" layoutY="313.0" text="UPLOAD A DOCUMENT">
-               <font>
-                  <Font size="15.0" />
-               </font>
-            </Label>
-            <TextField layoutX="550.0" layoutY="376.0" prefHeight="25.0" prefWidth="180.0" promptText="No File Chosen" />
-            <Button fx:id="continueButton" focusTraversable="false" layoutX="586.0" layoutY="473.0" mnemonicParsing="false" onAction="#continueButtonAction" text="Continue">
-               <font>
-                  <Font size="20.0" />
-               </font>
-            </Button>
-            <Button layoutX="607.0" layoutY="417.0" mnemonicParsing="false" text="Upload">
-               <font>
-                  <Font name="System Italic" size="15.0" />
-               </font>
-            </Button>
-            <Button fx:id="debugTestButton" layoutX="1188.0" layoutY="14.0" mnemonicParsing="false" onAction="#debugButtonAction" text="Debug/Test" />
-            <Button fx:id="inputScreenSignOutButton" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#inputScreenSignOutButtonAction" text="Sign out" />
-          </children>
-      </AnchorPane>
-      <AnchorPane fx:id="selectLanguageScreen" disable="true" prefHeight="528.0" prefWidth="624.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <AnchorPane fx:id="loginScreen" prefHeight="528.0" prefWidth="827.0" styleClass="backgroundPanel" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Label layoutX="149.0" layoutY="33.0" text="SELECT LANGUAGE">
-               <font>
-                  <Font name="Arial Black" size="30.0" />
-               </font>
-            </Label>
-            <ChoiceBox layoutX="239.0" layoutY="127.0" prefWidth="150.0">
-               <contextMenu>
-                  <ContextMenu>
-                    <items>
-                      <MenuItem mnemonicParsing="false" text="something" />
-                    </items>
-                  </ContextMenu>
-               </contextMenu>
-            </ChoiceBox>
-            <Button fx:id="checkForPlagiarismButton" layoutX="210.0" layoutY="388.0" mnemonicParsing="false" onAction="#checkForPlagiarismButtonAction" text="CHECK FOR PLAGIARISM">
-               <font>
-                  <Font name="Arial" size="15.0" />
-               </font>
-            </Button>
-         </children>
-      </AnchorPane>
-      <AnchorPane fx:id="resultsScreen" prefHeight="528.0" prefWidth="624.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <children>
-            <Button fx:id="startNewCheckButton" layoutX="223.0" layoutY="412.0" mnemonicParsing="false" onAction="#startNewCheckButtonAction" text="START NEW CHECK">
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </Button>
-            <Label layoutX="235.0" layoutY="21.0" text="RESULTS">
-               <font>
-                  <Font name="Arial Black" size="30.0" />
-               </font>
-            </Label>
-            <Label layoutX="161.0" layoutY="71.0" text="Plagiarised: " />
-            <Label layoutX="368.0" layoutY="71.0" text="Unique: " />
-            <Pane layoutX="51.0" layoutY="120.0" style="-fx-border-style: dotted;" AnchorPane.bottomAnchor="134.0" AnchorPane.leftAnchor="51.0" AnchorPane.rightAnchor="51.0" AnchorPane.topAnchor="120.0">
-               <children>
-                  <Label layoutX="14.0" layoutY="26.0" text="Sources Matched: " />
-                  <TextArea editable="false" layoutX="11.0" layoutY="53.0" prefHeight="200.0" prefWidth="500.0" promptText="text will be here, non editable" />
-                  <Label layoutX="14.0" layoutY="6.0" text="Document View">
-                     <font>
-                        <Font name="Arial Bold" size="15.0" />
-                     </font>
-                  </Label>
-               </children>
-               <padding>
-                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-               </padding>
-            </Pane>
-         </children>
-      </AnchorPane>
-      <AnchorPane fx:id="debugTestScreen" disable="true" prefHeight="528.0" prefWidth="624.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <children>
-            <Button fx:id="exitDebug" layoutX="541.0" layoutY="14.0" mnemonicParsing="false" onAction="#exitDebugAction" text="Exit debug" />
-            <TextField layoutX="14.0" layoutY="35.0" prefHeight="25.0" prefWidth="200.0" promptText="Title" />
-            <TextArea layoutX="14.0" layoutY="85.0" prefHeight="200.0" prefWidth="200.0" promptText="Text data" />
-            <Label layoutX="14.0" layoutY="18.0" text="Store in database" />
-            <TextField layoutX="14.0" layoutY="60.0" prefHeight="25.0" prefWidth="200.0" promptText="Uploader" />
-            <Button fx:id="storeButton" layoutX="81.0" layoutY="294.0" mnemonicParsing="false" onAction="#storeButtonAction" text="Store" />
-            <TextArea layoutX="222.0" layoutY="60.0" prefHeight="226.0" prefWidth="213.0" />
-            <Label layoutX="222.0" layoutY="18.0" text="Fetch a documents from database" />
-            <Button fx:id="fetchButton" layoutX="303.0" layoutY="294.0" mnemonicParsing="false" onAction="#fetchButtonAction" text="Fetch" />
-            <TextField layoutX="222.0" layoutY="35.0" prefHeight="25.0" prefWidth="213.0" promptText="Title" />
-            <Button fx:id="searchButton" layoutX="14.0" layoutY="478.0" mnemonicParsing="false" onAction="#searchButtonAction" text="Search" />
-            <Label layoutX="14.0" layoutY="336.0" text="Search With Bing" />
-            <TextArea fx:id="searchTextArea" layoutX="14.0" layoutY="353.0" prefHeight="118.0" prefWidth="364.0" promptText="Search Text" />
-            <TextArea fx:id="resultsText" editable="false" layoutX="402.0" layoutY="307.0" prefHeight="200.0" prefWidth="200.0" />
-         </children>
-      </AnchorPane>
-      <AnchorPane fx:id="loginScreen" prefHeight="528.0" prefWidth="827.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <children>
-            <Label layoutX="299.0" layoutY="25.0" text="The best plagiarism checker that you'll ever need">
+            <Label layoutX="34.0" layoutY="26.0" text="The best plagiarism checker that you'll ever need.">
                <font>
                   <Font name="Corbel" size="34.0" />
                </font>
@@ -136,7 +32,7 @@
                   <Image url="@../images/blur-book-stack-books-590493.jpg" />
                </image>
             </ImageView>
-            <AnchorPane fx:id="accountLogInOrSignUpPane" layoutX="659.0" layoutY="103.0" prefHeight="551.0" prefWidth="596.0">
+            <AnchorPane fx:id="accountLogInOrSignUpPane" layoutX="659.0" layoutY="103.0" prefHeight="551.0" prefWidth="596.0" styleClass="infoPane">
                <children>
                   <Button fx:id="goToCreateAccountButton" alignment="CENTER" layoutX="116.0" layoutY="197.0" mnemonicParsing="false" onAction="#goToCreateAccountButtonAction" prefHeight="39.0" prefWidth="364.0" text="Sign up with any email" textAlignment="CENTER">
                      <font>
@@ -160,7 +56,7 @@
                   </Label>
                </children>
             </AnchorPane>
-            <AnchorPane fx:id="createAccountPane" disable="true" layoutX="659.0" layoutY="103.0" prefHeight="551.0" prefWidth="596.0" visible="false">
+            <AnchorPane fx:id="createAccountPane" disable="true" layoutX="659.0" layoutY="103.0" prefHeight="551.0" prefWidth="596.0" styleClass="infoPane" visible="false">
                <children>
                   <Button fx:id="createAccountBackButton" cancelButton="true" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#createAccountBackButton" prefHeight="17.0" prefWidth="44.0" text="Back" />
                   <TextField fx:id="createAccountEmailField" layoutX="138.0" layoutY="197.0" prefHeight="44.0" prefWidth="320.0" promptText="Email">
@@ -211,7 +107,7 @@
                   </ImageView>
                </children>
             </AnchorPane>
-            <AnchorPane fx:id="signInPane" disable="true" layoutX="669.0" layoutY="113.0" prefHeight="551.0" prefWidth="596.0" visible="false">
+            <AnchorPane fx:id="signInPane" disable="true" layoutX="669.0" layoutY="113.0" prefHeight="551.0" prefWidth="596.0" styleClass="infoPane" visible="false">
                <children>
                   <Button fx:id="signInBackButton" cancelButton="true" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#signInBackButtonAction" prefHeight="17.0" prefWidth="44.0" text="Back" />
                   <TextField fx:id="signInEmailField" layoutX="138.0" layoutY="186.0" prefHeight="31.0" prefWidth="320.0" promptText="Email">
@@ -251,6 +147,135 @@
                   </ImageView>
                </children>
             </AnchorPane>
+            <ImageView fitHeight="189.0" fitWidth="173.0" layoutX="976.0" layoutY="-41.0" pickOnBounds="true" preserveRatio="true" AnchorPane.rightAnchor="131.0">
+               <image>
+                  <Image url="@../images/alphalogov1.0.png" />
+               </image>
+            </ImageView>
+            <Label layoutX="785.0" layoutY="26.0" text="Made by team">
+               <font>
+                  <Font name="Corbel" size="34.0" />
+               </font>
+            </Label>
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="mainScreen" disable="true" prefHeight="720.0" prefWidth="1280.0" styleClass="backgroundPanel" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+          <children>
+            <AnchorPane id="headerPane" prefHeight="52.0" prefWidth="1280.0">
+               <children>
+                  <Label layoutX="505.0" layoutY="5.0" text="Plagiarism Checker">
+                     <font>
+                        <Font name="Corbel" size="34.0" />
+                     </font>
+                  </Label>
+                  <Button fx:id="debugTestButton" layoutX="1174.0" layoutY="12.0" mnemonicParsing="false" onAction="#debugButtonAction" text="Debug/Test" />
+                  <Button fx:id="mainScreenSignOutButton" layoutX="14.0" layoutY="12.0" mnemonicParsing="false" onAction="#mainScreenSignOutButtonAction" text="Sign out" />
+                  <Label layoutX="129.0" layoutY="16.0" text="Logged in: ">
+                     <font>
+                        <Font name="Corbel" size="15.0" />
+                     </font>
+                  </Label>
+               </children>
+            </AnchorPane>
+            <AnchorPane fx:id="inputScreen" layoutX="14.0" layoutY="69.0" prefHeight="635.0" prefWidth="607.0" styleClass="infoPane" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="659.0" AnchorPane.topAnchor="69.0">
+               <children>
+                  <Button fx:id="testTranslateButton" layoutX="481.0" layoutY="530.0" mnemonicParsing="false" onAction="#testTranslateButtonAction" text="test translate" />
+                  <Label layoutX="467.0" layoutY="508.0" text="USE THIS SPARINGLY" />
+                  <TextArea fx:id="inputTextArea" layoutX="13.0" layoutY="85.0" prefHeight="253.0" prefWidth="580.0" promptText="Please insert your text here to check for plagiarism" />
+                  <Label layoutX="14.0" layoutY="349.0" text="Or upload a document:">
+                     <font>
+                        <Font name="Corbel" size="17.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="filePathTextField" layoutX="13.0" layoutY="378.0" prefHeight="25.0" prefWidth="229.0" promptText="No File Chosen" />
+                  <Button fx:id="uploadButton" layoutX="461.0" layoutY="372.0" mnemonicParsing="false" onAction="#uploadButtonAction" prefWidth="88.0" text="Upload">
+                     <font>
+                        <Font name="Corbel" size="20.0" />
+                     </font>
+                  </Button>
+                  <TextField fx:id="titleField" layoutX="14.0" layoutY="51.0" promptText="Title of document" />
+                  <Label layoutX="221.0" layoutY="14.0" text="Provide a text file:">
+                     <font>
+                        <Font name="Corbel" size="20.0" />
+                     </font>
+                  </Label>
+                  <Separator layoutX="11.0" layoutY="34.0" prefHeight="17.0" prefWidth="580.0" />
+                  <Button fx:id="browseForAFileButton" layoutX="250.0" layoutY="378.0" mnemonicParsing="false" onAction="#browseForAFileButtonAction" text="Browse for file" />
+                  <TreeView layoutX="14.0" layoutY="411.0" prefHeight="210.0" prefWidth="356.0" />
+               </children>
+            </AnchorPane>
+            <AnchorPane fx:id="selectLanguageScreen" disable="true" layoutX="633.0" layoutY="69.0" prefHeight="635.0" prefWidth="627.0" styleClass="infoPane">
+               <children>
+                  <Label layoutX="213.0" layoutY="14.0" text="Select target language:">
+                     <font>
+                        <Font name="Corbel" size="20.0" />
+                     </font>
+                  </Label>
+                  <ChoiceBox layoutX="233.0" layoutY="185.0" prefWidth="150.0">
+                     <contextMenu>
+                        <ContextMenu>
+                          <items>
+                            <MenuItem mnemonicParsing="false" text="something" />
+                          </items>
+                        </ContextMenu>
+                     </contextMenu>
+                  </ChoiceBox>
+                  <Button fx:id="checkForPlagiarismButton" layoutX="206.0" layoutY="280.0" mnemonicParsing="false" onAction="#checkForPlagiarismButtonAction" text="CHECK FOR PLAGIARISM">
+                     <font>
+                        <Font name="Arial" size="15.0" />
+                     </font>
+                  </Button>
+                  <Separator layoutX="17.0" layoutY="37.0" prefHeight="10.0" prefWidth="596.0" />
+               </children>
+            </AnchorPane>
+            <AnchorPane fx:id="resultsScreen" disable="true" layoutX="15.0" layoutY="70.0" prefHeight="635.0" prefWidth="1247.0" styleClass="infoPane" visible="false" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="18.0" AnchorPane.topAnchor="70.0">
+               <children>
+                  <Label layoutX="235.0" layoutY="21.0" text="RESULTS">
+                     <font>
+                        <Font name="Arial Black" size="30.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="161.0" layoutY="71.0" text="Plagiarised: " />
+                  <Label layoutX="368.0" layoutY="71.0" text="Unique: " />
+                  <Pane layoutX="51.0" layoutY="120.0" style="-fx-border-style: dotted;" AnchorPane.bottomAnchor="134.0" AnchorPane.leftAnchor="51.0" AnchorPane.rightAnchor="51.0" AnchorPane.topAnchor="120.0">
+                     <children>
+                        <Label layoutX="14.0" layoutY="26.0" text="Sources Matched: " />
+                        <TextArea editable="false" layoutX="11.0" layoutY="53.0" prefHeight="200.0" prefWidth="500.0" promptText="text will be here, non editable" />
+                        <Label layoutX="14.0" layoutY="6.0" text="Document View">
+                           <font>
+                              <Font name="Arial Bold" size="15.0" />
+                           </font>
+                        </Label>
+                        <Button fx:id="startNewCheckButton" layoutX="148.0" layoutY="294.0" mnemonicParsing="false" onAction="#startNewCheckButtonAction" text="START NEW CHECK">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Button>
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </Pane>
+               </children>
+            </AnchorPane>
+          </children>
+      </AnchorPane>
+      <AnchorPane fx:id="debugTestScreen" disable="true" prefHeight="528.0" prefWidth="624.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Button fx:id="exitDebug" layoutX="541.0" layoutY="14.0" mnemonicParsing="false" onAction="#exitDebugAction" text="Exit debug" />
+            <TextField layoutX="14.0" layoutY="35.0" prefHeight="25.0" prefWidth="200.0" promptText="Title" />
+            <TextArea layoutX="14.0" layoutY="85.0" prefHeight="200.0" prefWidth="200.0" promptText="Text data" />
+            <Label layoutX="14.0" layoutY="18.0" text="Store in database" />
+            <TextField layoutX="14.0" layoutY="60.0" prefHeight="25.0" prefWidth="200.0" promptText="Uploader" />
+            <Button fx:id="storeButton" layoutX="81.0" layoutY="294.0" mnemonicParsing="false" onAction="#storeButtonAction" text="Store" />
+            <TextArea layoutX="222.0" layoutY="60.0" prefHeight="226.0" prefWidth="213.0" />
+            <Label layoutX="222.0" layoutY="18.0" text="Fetch a documents from database" />
+            <Button fx:id="fetchButton" layoutX="303.0" layoutY="294.0" mnemonicParsing="false" onAction="#fetchButtonAction" text="Fetch" />
+            <TextField layoutX="222.0" layoutY="35.0" prefHeight="25.0" prefWidth="213.0" promptText="Title" />
+            <Button fx:id="searchButton" layoutX="14.0" layoutY="478.0" mnemonicParsing="false" onAction="#searchButtonAction" text="Search" />
+            <Label layoutX="14.0" layoutY="336.0" text="Search With Bing" />
+            <TextArea fx:id="searchTextArea" layoutX="14.0" layoutY="353.0" prefHeight="118.0" prefWidth="364.0" promptText="Search Text" />
+            <TextArea fx:id="resultsText" editable="false" layoutX="402.0" layoutY="307.0" prefHeight="200.0" prefWidth="200.0" />
          </children>
       </AnchorPane>
    </children>

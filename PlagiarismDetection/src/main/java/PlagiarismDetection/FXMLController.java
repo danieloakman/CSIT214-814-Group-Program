@@ -19,23 +19,61 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
+import javafx.stage.FileChooser;
 
 public class FXMLController implements Initializable {
-    
     @FXML
-    private ResourceBundle resources;
+    private AnchorPane loginScreen;
     @FXML
-    private URL location;
+    private AnchorPane accountLogInOrSignUpPane;
     @FXML
-    private AnchorPane inputScreen;
+    private Button goToCreateAccountButton;
+    @FXML
+    private Button goToSignInButton;
+    @FXML
+    private AnchorPane createAccountPane;
+    @FXML
+    private Button createAccountBackButton;
+    @FXML
+    private TextField createAccountEmailField;
+    @FXML
+    private PasswordField createAccountPasswordField;
+    @FXML
+    private Button createAccountButton;
+    @FXML
+    private Label createAccountErrorLabel;
+    @FXML
+    private ImageView createAccountLoadingGif;
+    @FXML
+    private AnchorPane signInPane;
+    @FXML
+    private Button signInBackButton;
+    @FXML
+    private TextField signInEmailField;
+    @FXML
+    private PasswordField signInPasswordField;
+    @FXML
+    private Button signInButton;
+    @FXML
+    private Label signInErrorLabel;
+    @FXML
+    private ImageView signInLoadingGif;
+    @FXML
+    private AnchorPane mainScreen;
+    @FXML
+    private Button debugTestButton;
+    @FXML
+    private Button mainScreenSignOutButton;
     @FXML
     private Button testTranslateButton;
     @FXML
     private TextArea inputTextArea;
     @FXML
-    private Button continueButton;
+    private TextField filePathTextField;
     @FXML
-    private Button debugTestButton;
+    private TextField titleField;
+    @FXML
+    private Button browseForAFileButton;
     @FXML
     private AnchorPane selectLanguageScreen;
     @FXML
@@ -47,6 +85,8 @@ public class FXMLController implements Initializable {
     @FXML
     private AnchorPane debugTestScreen;
     @FXML
+    private AnchorPane inputScreen;
+    @FXML
     private Button exitDebug;
     @FXML
     private Button storeButton;
@@ -55,57 +95,21 @@ public class FXMLController implements Initializable {
     @FXML
     private Button searchButton;
     @FXML
+    private Button uploadButton;
+    @FXML
     private TextArea searchTextArea;
     @FXML
     private TextArea resultsText;
-    @FXML
-    private AnchorPane loginScreen;
-    @FXML
-    private AnchorPane accountLogInOrSignUpPane;
-    @FXML
-    private Button goToAccountCreateButton;
-    @FXML
-    private Button goToSignInButton;
-    @FXML
-    private AnchorPane signInPane;
-    @FXML
-    private AnchorPane createAccountPane;
-    @FXML
-    private TextField createAccountEmailField;
-    @FXML
-    private PasswordField createAccountPasswordField;
-    @FXML
-    private Button createAccountBackButton;
-    @FXML
-    private Button createAccountButton;
-    @FXML
-    private TextField signInEmailField;
-    @FXML
-    private PasswordField signInPasswordField;
-    @FXML
-    private Button signInButton;
-    @FXML
-    private Button signInBackButton;
-    @FXML
-    private Label signInErrorLabel;
-    @FXML
-    private Label createAccountErrorLabel;
-    @FXML
-    private Button inputScreenSignOutButton;
-    @FXML
-    private ImageView createAccountLoadingGif;
-    @FXML
-    private ImageView signInLoadingGif;
     
     static String errorLabel;
     
     @FXML
-    void inputScreenSignOutButtonAction(ActionEvent event) {
+    void mainScreenSignOutButtonAction(ActionEvent event) {
         Firebase.loggedIn = false;
         Firebase.currentUser.email = "";
         Firebase.currentUser.password = "";
-        inputScreen.setDisable(true);
-        inputScreen.setVisible(false);
+        mainScreen.setDisable(true);
+        mainScreen.setVisible(false);
         loginScreen.setDisable(false);
         loginScreen.setVisible(true);
     }
@@ -123,6 +127,7 @@ public class FXMLController implements Initializable {
         System.out.println("Starting new plagiarism check...");
         resultsScreen.setVisible(false);
         resultsScreen.setDisable(true);
+        selectLanguageScreen.setVisible(true);
         inputScreen.setDisable(false);
         inputScreen.setVisible(true);
     }
@@ -132,16 +137,15 @@ public class FXMLController implements Initializable {
         System.out.println("Checking for plagiarism...");
         selectLanguageScreen.setVisible(false);
         selectLanguageScreen.setDisable(true);
+        inputScreen.setDisable(true);
+        inputScreen.setVisible(false);
         resultsScreen.setVisible(true);
         resultsScreen.setDisable(false);
     }
     
     @FXML
-    private void continueButtonAction(ActionEvent event) {
-        System.out.println("Continue...");
-        inputScreen.setDisable(true);
-        inputScreen.setVisible(false);
-        selectLanguageScreen.setVisible(true);
+    void uploadButtonAction(ActionEvent event) {
+        // upload document to database and link to currently logged in user
         selectLanguageScreen.setDisable(false);
     }
     
@@ -164,8 +168,8 @@ public class FXMLController implements Initializable {
     @FXML
     void debugButtonAction(ActionEvent event) {
         System.out.println("Debug/test screen...");
-        inputScreen.setDisable(true);
-        inputScreen.setVisible(false);
+        mainScreen.setDisable(true);
+        mainScreen.setVisible(false);
         debugTestScreen.setDisable(false);
         debugTestScreen.setVisible(true);
     }
@@ -175,8 +179,8 @@ public class FXMLController implements Initializable {
         System.out.println("Exiting debug/test screen...");
         debugTestScreen.setDisable(true);
         debugTestScreen.setVisible(false);
-        inputScreen.setDisable(false);
-        inputScreen.setVisible(true);
+        mainScreen.setDisable(false);
+        mainScreen.setVisible(true);
     }
     
     @FXML
@@ -291,8 +295,8 @@ public class FXMLController implements Initializable {
                             signInLoadingGif.setVisible(false);
                             loginScreen.setDisable(true);
                             loginScreen.setVisible(false);
-                            inputScreen.setDisable(false);
-                            inputScreen.setVisible(true);
+                            mainScreen.setDisable(false);
+                            mainScreen.setVisible(true);
                         }
                         // turn off the loading gif
                         signInLoadingGif.setVisible(false);
@@ -370,8 +374,8 @@ public class FXMLController implements Initializable {
                             // Change screens:
                             loginScreen.setDisable(true);
                             loginScreen.setVisible(false);
-                            inputScreen.setDisable(false);
-                            inputScreen.setVisible(true);
+                            mainScreen.setDisable(false);
+                            mainScreen.setVisible(true);
                             System.out.println("Newly created user in now signed in.");
                         }
                         // Turn off the loading gif
@@ -380,6 +384,12 @@ public class FXMLController implements Initializable {
                 });
             }
         }).start();
+    }
+    
+    @FXML
+    void browseForAFileButtonAction(ActionEvent event) {
+        final FileChooser fileChooser = new FileChooser();
+        
     }
     
     @Override
