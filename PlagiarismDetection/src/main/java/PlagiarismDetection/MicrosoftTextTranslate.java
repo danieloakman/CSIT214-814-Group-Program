@@ -8,47 +8,35 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import javax.net.ssl.HttpsURLConnection;
-
-/*
- * Gson: https://github.com/google/gson
- * Maven info:
- *     groupId: com.google.code.gson
- *     artifactId: gson
- *     version: 2.8.1
- */
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import javax.xml.bind.annotation.XmlElement;
 
 public class MicrosoftTextTranslate {
-// Replace the subscriptionKey string value with your valid subscription key.
-    static String subscriptionKey = "fcbbf8e698214b7183d45dc5c7938739";
-
-    static String host = "https://api.cognitive.microsofttranslator.com";
-    static String path = "/translate?api-version=3.0";
-
-    // Translate to German and Italian.
-//    static String params = "&to=de&to=it";
-
-//    static String text = "Hello world!";
+    final private static String SUBSCRIPTIONKEY = "fcbbf8e698214b7183d45dc5c7938739";
+    final private static String HOST = "https://api.cognitive.microsofttranslator.com";
+    final private static String PATH = "/translate?api-version=3.0";
+    public String params;
+    public String translatedText = "";
 
     public static class RequestBody {
         String Text;
-
         public RequestBody(String text) {
             this.Text = text;
         }
     }
 
-    // DO NOT TOUCH THIS METHOD
-    public static String Post (URL url, String content) throws Exception {
+    /*
+     *  This function was not written by the team. Source: https://docs.microsoft.com/en-us/azure/cognitive-services/translator/quickstart-java-translate
+     */
+    public String Post (URL url, String content) throws Exception {
         HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setRequestProperty("Content-Length", content.length() + "");
-        connection.setRequestProperty("Ocp-Apim-Subscription-Key", subscriptionKey);
+        connection.setRequestProperty("Ocp-Apim-Subscription-Key", SUBSCRIPTIONKEY);
         connection.setRequestProperty("X-ClientTraceId", java.util.UUID.randomUUID().toString());
         connection.setDoOutput(true);
 
@@ -69,19 +57,81 @@ public class MicrosoftTextTranslate {
         return response.toString();
     }
 
-    public static String Translate (String text, String params) throws Exception {
-        URL url = new URL (host + path + params);
+    /*
+     *  Most of this was not written by the team, only changed the return type to void.
+     *  Source: https://docs.microsoft.com/en-us/azure/cognitive-services/translator/quickstart-java-translate
+     *
+     *  Sets internal class attribute called translatedText to be the translation of text parameter.
+     */
+    public void translateAString (String text) throws Exception {
+        URL url = new URL (HOST + PATH + params);
 
-        List<RequestBody> objList = new ArrayList<RequestBody>();
+        List<RequestBody> objList = new ArrayList<>();
         objList.add(new RequestBody(text));
         String content = new Gson().toJson(objList);
-        return Post(url, content);
+        translatedText = Post(url, content);
     }
 
-    public static String prettify(String json_text) {
+    /*
+     *  This function was not written by the team. Was found on 
+     */
+    public String prettify(String json_text) {
         JsonParser parser = new JsonParser();
         JsonElement json = parser.parse(json_text);
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         return gson.toJson(json);
+    }
+    
+    /*
+     *  Returns this part of json_text:
+     *      "text":"[EVERYTHING IN HERE]","to":
+     */
+    public String getTextFromJson (String json_text) {
+        return json_text.substring(json_text.indexOf("\"text\":") + 8, json_text.indexOf("\",\"to\":"));
+    }
+    
+    /*
+     *  Set the params global variable to be used in the next text translation.
+     */
+    public void setParams (String str) {
+        switch (str) {
+            case "Arabic":
+                params = "&to=ar";
+                break;
+            case "Chinese Simplified":
+                params = "&to=zh-Hans";
+                break;
+            case "Chinese Traditional":
+                params = "&to=zh-Hant";
+                break;
+            case "French":
+                params = "&to=fr";
+                break;
+            case "German":
+                params = "&to=de";
+                break;
+            case "Hindi":
+                params = "&to=hi";
+                break;
+            case "Italian":
+                params = "&to=it";
+                break;
+            case "Russian":
+                params = "&to=ru";
+                break;
+            case "Spanish":
+                params = "&to=es";
+                break;
+            default:
+                break;
+        }
+    }
+    
+    /*
+     *  All supported languages can be found here: https://api.cognitive.microsofttranslator.com/languages?api-version=3.0
+     */
+    public static void getAllSupportedLanguages () {
+        // do a GET request of the above URL
+        // todo
     }
 }

@@ -6,8 +6,15 @@ package PlagiarismDetection;
 
 import static PlagiarismDetection.FXMLController.executor;
 import com.google.firebase.auth.UserRecord;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
 import javafx.application.Platform;
@@ -21,9 +28,15 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import java.util.concurrent.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.collections.FXCollections;
+import javafx.scene.control.ChoiceBox;
+import javafx.stage.Stage;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 
 public class FXMLController implements Initializable {
     @FXML
@@ -73,8 +86,6 @@ public class FXMLController implements Initializable {
     @FXML
     private TextArea inputTextArea;
     @FXML
-    private TextField filePathTextField;
-    @FXML
     private TextField titleField;
     @FXML
     private Button browseForAFileButton;
@@ -108,9 +119,24 @@ public class FXMLController implements Initializable {
     private Label initialiseErrorLabel;
     @FXML
     private ImageView logInOrSignUpLoadingGif;
+    @FXML
+    private Label inputScreenErrorLabel;
+    @FXML
+    private Label currentUserLoggedInLabel;
+    @FXML
+    private ImageView uploadDocumentLoadingGif;
+    @FXML
+    private ChoiceBox targetLanguageChoiceBox;
+    @FXML
+    private TextArea translatedTextArea;
+    @FXML
+    private ImageView translateTextLoadingGif;
+    @FXML
+    private Label translateTextErrorLabel;
     
     static String errorLabel;
-    static ExecutorService executor;// = Executors.newSingleThreadExecutor();
+    static ExecutorService executor;
+    static FileChooser fileChooser;
     
     @FXML
     void mainScreenSignOutButtonAction(ActionEvent event) {
@@ -148,11 +174,16 @@ public class FXMLController implements Initializable {
         selectLanguageScreen.setVisible(true);
         inputScreen.setDisable(false);
         inputScreen.setVisible(true);
+        translatedTextArea.setText("");
     }
     
     @FXML
     void checkForPlagiarismButtonAction(ActionEvent event) {
         System.out.println("Checking for plagiarism...");
+        // Empty input title and text fields:
+        titleField.setText("");
+        inputTextArea.setText("");
+        // Change screens:
         selectLanguageScreen.setVisible(false);
         selectLanguageScreen.setDisable(true);
         inputScreen.setDisable(true);
@@ -161,26 +192,83 @@ public class FXMLController implements Initializable {
         resultsScreen.setDisable(false);
     }
     
+    /*
+     *  upload document to database and link to currently logged in user
+     */
     @FXML
     void uploadButtonAction(ActionEvent event) {
-        // upload document to database and link to currently logged in user
-        selectLanguageScreen.setDisable(false);
+        uploadDocumentLoadingGif.setVisible(true);
+        inputScreenErrorLabel.setText("");
+        final String title = titleField.getText();
+        final String text = inputTextArea.getText();
+        // check if title or text field is empty:
+        if (title.isEmpty() || text.isEmpty()) {
+            inputScreenErrorLabel.setText("Error, title or text field is empty.");
+            System.out.println("Error, title or text field is empty.");
+            uploadDocumentLoadingGif.setVisible(false);
+            return;
+        }
+        // Run the following in a new thread:
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // store the document in the database, along with linking it to the user that uploaded it
+                Firebase.storeDocumentInDatabase(text, Firebase.currentUser.email, title);
+                // Run this after document has been stored in database:
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        uploadDocumentLoadingGif.setVisible(false);
+                        // Allow user to access translate screen:
+                        selectLanguageScreen.setDisable(false);
+                    }
+                });
+            }
+        }).start();
     }
     
     @FXML
     void testTranslateButtonAction(ActionEvent event) {
-        try {
-            String text = inputTextArea.getText();
-            System.out.println("Before translation: " + text);
-            String params = "&to=de&to=it"; // get german and italian translation. Probably will just change this to English only
-            String response = MicrosoftTextTranslate.Translate (text, params);
-            String printOutThis = MicrosoftTextTranslate.prettify (response);
-            System.out.println ("After translation(this is a JSON):" + printOutThis);
-            inputTextArea.appendText("\nThis is a JSON. We can change this later to just return the text we need.\n" + printOutThis);
+        translateTextErrorLabel.setText("");
+        final MicrosoftTextTranslate translator = new MicrosoftTextTranslate();
+        final String text = inputTextArea.getText();
+        translateTextLoadingGif.setVisible(true);
+        if (targetLanguageChoiceBox.getSelectionModel().isEmpty()) { // if there is no selected language
+            translateTextErrorLabel.setText("No target language currently selected.");
+            System.out.println("No target language currently selected.");
+            translateTextLoadingGif.setVisible(false);
+            return;
         }
-        catch (Exception e) {
-            System.out.println (e);
-        }
+        translator.setParams(targetLanguageChoiceBox.getValue().toString());
+        System.out.println("Target language: " + targetLanguageChoiceBox.getValue().toString());
+        // Run the following in a new thread:
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    translator.translateAString(text);
+                } catch (Exception ex) {
+                    // maybe add some set error label messages here to say what level error it was, i.e. 400, 401, etc, and their descriptions
+                    System.out.println(ex.getMessage());
+                }
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        translateTextLoadingGif.setVisible(false);
+                        // only set text area if translation was successful
+                        if (!translator.translatedText.isEmpty()) {
+                            System.out.println("Successfully translated text!");
+                            System.out.println("After translation:\n" + translator.prettify(translator.translatedText));
+                            translatedTextArea.setText(translator.getTextFromJson(translator.translatedText));
+                            checkForPlagiarismButton.setDisable(false);
+                        } else {
+                            System.out.println("Something went wrong, translatedText is empty.");
+                            translateTextErrorLabel.setText("Error, failed to translate.");
+                        }
+                    }
+                });
+            }
+        }).start();
     }
     
     @FXML
@@ -307,6 +395,9 @@ public class FXMLController implements Initializable {
                         if (Firebase.loggedIn) {
                             // Logged user in successfully.
                             System.out.println("Logged in successfully.");
+                            currentUserLoggedInLabel.setText("Logged in: " + email);
+                            Firebase.currentUser.email = email;
+                            Firebase.currentUser.password = password;
                             signInErrorLabel.setText("");
                             signInEmailField.setText("");
                             signInPasswordField.setText("");
@@ -386,6 +477,7 @@ public class FXMLController implements Initializable {
                             createAccountPasswordField.setText("");
                             System.out.println("createAccountButtonAction() successfully created a user.");
                             // Automatically sign in the newly created user
+                            currentUserLoggedInLabel.setText("Logged in: " + email);
                             Firebase.loggedIn = true;
                             Firebase.currentUser.email = email;
                             Firebase.currentUser.password = password;
@@ -394,7 +486,7 @@ public class FXMLController implements Initializable {
                             loginScreen.setVisible(false);
                             mainScreen.setDisable(false);
                             mainScreen.setVisible(true);
-                            System.out.println("Newly created user in now signed in.");
+                            System.out.println("Newly created user is now signed in.");
                         }
                         // Turn off the loading gif
                         createAccountLoadingGif.setVisible(false);
@@ -406,7 +498,54 @@ public class FXMLController implements Initializable {
     
     @FXML
     void browseForAFileButtonAction(ActionEvent event) {
-        final FileChooser fileChooser = new FileChooser();
+        inputScreenErrorLabel.setText("");
+        fileChooser = new FileChooser();
+        Stage stage = new Stage();
+        File file = fileChooser.showOpenDialog(stage);
+        if (file != null) { // if there was a file chosen
+            String fileText = "";
+            System.out.println("file name: " + file.getName());
+            try {
+                // determine what the file extension is:
+                if (file.getName().matches(".+.txt")) { // matches [anyCharacters].txt
+                    // read from the .txt file and store in the relevant text fields and areas:
+                    BufferedReader in = new BufferedReader (new FileReader (file.getAbsolutePath()));
+                    String line = in.readLine();
+                    while (line != null) {
+                        fileText += line + "\n";
+                        line = in.readLine();
+                    }
+                    in.close();
+                    System.out.println("fileText: " + fileText);
+                    inputTextArea.setText(fileText);
+                    titleField.setText(file.getName().substring(0, file.getName().indexOf(".txt")));
+//                    filePathTextField.setText(file.getAbsolutePath());
+                } else if (file.getName().matches(".+.docx")) { // matches [anyCharacters].docx
+                    // read from the .docx file and store in the relevant text fields and areas:
+                    FileInputStream in;
+                    in = new FileInputStream(file.getAbsolutePath());
+                    try {
+                        XWPFDocument document = new XWPFDocument(in);
+                        List<XWPFParagraph> paragraphs = document.getParagraphs();
+                        for (XWPFParagraph para : paragraphs)
+                            fileText += para.getText() + "\n";
+                        in.close();
+                        System.out.println("fileText: \n" + fileText);
+                        inputTextArea.setText(fileText);
+                        titleField.setText(file.getName().substring(0, file.getName().indexOf(".docx")));
+                    } catch (Exception ex) {
+                        System.out.println("Something is wrong with the .docx file.");
+                    }
+                } else {
+                    inputScreenErrorLabel.setText("Error, either a .docx or .txt file must be selected.");
+                }
+            } catch (IOException ex) {
+                System.out.println("IOException: reading '" + file.getName() + "'.");
+                inputScreenErrorLabel.setText("Error while reading '" + file.getName() + "'.");
+            }
+        } else {
+            System.out.println("No file was selected.");
+        }
     }
     
     void checkFirebaseConnection () {
@@ -475,6 +614,11 @@ public class FXMLController implements Initializable {
         // Initialise and validate the connection to the Firebase API.
         Firebase.initialise();
         checkFirebaseConnection();
+        targetLanguageChoiceBox.setItems(FXCollections.observableArrayList(
+            "Arabic", "Chinese Simplified", "Chinese Traditional",
+            "French", "German", "Hindi",
+            "Italian", "Russian", "Spanish"
+        ));
     }
 }
 
