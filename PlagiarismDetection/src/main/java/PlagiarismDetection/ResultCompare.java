@@ -51,4 +51,10 @@ public class ResultCompare {
         
         return percentContent;
     }
+    
+    @Override
+    public String toString(){
+        return title + "        " + percent + "\n" + content;
+    
+    }
 }

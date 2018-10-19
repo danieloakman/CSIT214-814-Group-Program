@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonArray;
 
 public class WebSearch {
     static String subscriptionKey = "cd19e4797ef14c9984899ea5e09bf2b6";
@@ -19,6 +20,7 @@ public class WebSearch {
     static String path = "/bing/v7.0/search";
     static String searchTerm;
     static String results = "";
+    static ArrayList<String> santitizedText;
     
     public static WebResults Search(String term) throws Exception {
         URL url = new URL(host + path + "?q=" +  URLEncoder.encode(term, "UTF-8"));
@@ -43,11 +45,16 @@ public class WebSearch {
         return results;
     }
     
-    public static String parse(String json_txt){
+    public static ArrayList<String> parse(String json_txt){
         JsonParser parser = new JsonParser();
         JsonObject json = parser.parse(json_txt).getAsJsonObject();
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        return gson.toJson(json);
+        ArrayList<String> returning = new ArrayList<>();
+        JsonArray array = json.getAsJsonArray("webPages/value");
+        for(int i = 0; i < array.size(); i++){
+            returning.add(array.get(i).getAsJsonObject().get("name").getAsString());
+            returning.add(array.get(i).getAsJsonObject().get("snippet").getAsString());
+        }
+        return returning;
     }
     
     public static void start(String searchTxt){
@@ -60,10 +67,8 @@ public class WebSearch {
         try{
             WebResults result = Search(searchTxt);
             
-            for(String header : result.relavantHeaders.keySet()){
-                results = results.concat(header + ": " + result.relavantHeaders.get(header));
-                results = results.concat(parse(result.jsonResponse));
-            }
+            santitizedText = parse(result.jsonResponse);
+            
         }
         catch(Exception e){
             e.printStackTrace(System.out);

@@ -119,7 +119,15 @@ public class FXMLController implements Initializable {
         String searchText = searchTextArea.getText();
         WebSearch.start(searchText);
         ArrayList<ResultCompare> display = new ArrayList<>();
-        resultsText.setText(WebSearch.results);
+        
+        for(int i = 0; i < WebSearch.santitizedText.size(); i += 2){
+            display.add(new ResultCompare(WebSearch.santitizedText.get(i), WebSearch.santitizedText.get(i+1)));
+        }
+        
+        for (ResultCompare display1 : display) {
+            resultsText.setText(resultsText.getText() + display1.toString());
+        }
+        
     }
 
     @FXML
