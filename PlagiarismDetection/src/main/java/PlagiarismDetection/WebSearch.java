@@ -49,7 +49,16 @@ public class WebSearch {
         JsonParser parser = new JsonParser();
         JsonObject json = parser.parse(json_txt).getAsJsonObject();
         ArrayList<String> returning = new ArrayList<>();
-        JsonArray array = json.getAsJsonArray("webPages/value");
+        JsonObject wtf = json.getAsJsonObject("webPages");
+        JsonArray array = wtf.getAsJsonArray("value");
+        String lol = array.get(0).getAsJsonObject().get("name").getAsString();
+        try{
+            System.out.println(array.size());
+        }
+        catch(Exception e){
+            System.out.println(lol);
+        }
+        
         for(int i = 0; i < array.size(); i++){
             returning.add(array.get(i).getAsJsonObject().get("name").getAsString());
             returning.add(array.get(i).getAsJsonObject().get("snippet").getAsString());
@@ -66,6 +75,8 @@ public class WebSearch {
         
         try{
             WebResults result = Search(searchTxt);
+            
+            System.out.println(result.jsonResponse);
             
             santitizedText = parse(result.jsonResponse);
             

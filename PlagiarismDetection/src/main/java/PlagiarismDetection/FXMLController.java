@@ -133,8 +133,8 @@ public class FXMLController implements Initializable {
             display.add(new ResultCompare(WebSearch.santitizedText.get(i), WebSearch.santitizedText.get(i+1)));
         }
         
-        for (ResultCompare display1 : display) {
-            resultsText.setText(resultsText.getText() + display1.toString());
+        for (int i = 0; i < display.size(); i++) {
+            resultsText.setText(resultsText.getText() + i + ". " + display.get(i).toString() + "\n");
         }
         
     }
