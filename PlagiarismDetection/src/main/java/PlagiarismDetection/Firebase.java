@@ -171,7 +171,6 @@ public class Firebase {
         try {
             DocumentSnapshot user = future.get();
             if (user.exists()) {
-                System.out.println("User data: " + user.getData());
                 if (user.get("admin").equals(true)) { // if admin == true
                     currentUser.admin = true;
                     System.out.println(currentUser.email + " is an admin");
