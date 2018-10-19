@@ -104,8 +104,6 @@ public class FXMLController implements Initializable {
     @FXML
     private Button exitDebug;
     @FXML
-    private Button storeButton;
-    @FXML
     private Button fetchButton;
     @FXML
     private Button searchButton;
@@ -133,6 +131,8 @@ public class FXMLController implements Initializable {
     private ImageView translateTextLoadingGif;
     @FXML
     private Label translateTextErrorLabel;
+    @FXML
+    private TextArea testDebugTextArea;
     
     static String errorLabel;
     static ExecutorService executor;
@@ -140,9 +140,19 @@ public class FXMLController implements Initializable {
     
     @FXML
     void mainScreenSignOutButtonAction(ActionEvent event) {
+        // set firebase static currentUser attributes to empty
         Firebase.loggedIn = false;
         Firebase.currentUser.email = "";
         Firebase.currentUser.password = "";
+        // reset UI
+        currentUserLoggedInLabel.setText("Logged in:");
+        debugTestButton.setVisible(false);
+        titleField.setText("");
+        inputTextArea.setText("");
+        selectLanguageScreen.setDisable(true);
+        checkForPlagiarismButton.setDisable(true);
+        translatedTextArea.setText("");
+        // change screens:
         mainScreen.setDisable(true);
         mainScreen.setVisible(false);
         loginScreen.setDisable(false);
@@ -291,14 +301,10 @@ public class FXMLController implements Initializable {
     
     @FXML
     void fetchButtonAction(ActionEvent event) {
-        System.out.println("Attempting database fetch...");
-        Firebase.getDocumentFromDatabase();
+        System.out.println("Fetching all documents from database...");
+        Firebase.getAllDocumentsFromDatabase();
+        testDebugTextArea.appendText("Documents printed in console.");
         System.out.println("Fetched...");
-    }
-    
-    @FXML
-    void storeButtonAction(ActionEvent event) {
-        Firebase.storeDocumentInDatabase("something", "guy", "title1");
     }
     
     @FXML
@@ -372,8 +378,8 @@ public class FXMLController implements Initializable {
                         System.out.println("A user with that email exists, continue...");
                         // If user does exist, then attempt logging in:
                         try {
-                            if (Firebase.signIn(email, password)) {
-                                Firebase.loggedIn = true;
+                            if (Firebase.signIn(email, password, false)) {
+                                System.out.println("Now logging the user in...");
                             } else {
                                 System.out.println("Error, password is incorrect.");
                                 errorLabel = "Error, password is incorrect.";
@@ -396,12 +402,14 @@ public class FXMLController implements Initializable {
                             // Logged user in successfully.
                             System.out.println("Logged in successfully.");
                             currentUserLoggedInLabel.setText("Logged in: " + email);
-                            Firebase.currentUser.email = email;
-                            Firebase.currentUser.password = password;
+                            if(Firebase.currentUser.admin) {
+                                debugTestButton.setVisible(true);
+                            }
                             signInErrorLabel.setText("");
                             signInEmailField.setText("");
                             signInPasswordField.setText("");
                             signInLoadingGif.setVisible(false);
+                            // change screens:
                             loginScreen.setDisable(true);
                             loginScreen.setVisible(false);
                             mainScreen.setDisable(false);
@@ -459,8 +467,7 @@ public class FXMLController implements Initializable {
                     try {
                         // try and create the account:
                         Firebase.createUserWithEmailAndPassword(email, password);
-                        // Store password in database for signing in later.
-                        Firebase.storePasswordInDatabase(email, password);
+                        Firebase.signIn(email, password, true);
                     } catch (InterruptedException | ExecutionException er) {
                         errorLabel = "Error, could not create user.";
                         System.err.println("createAccount error: " + ex.getMessage());
@@ -478,9 +485,9 @@ public class FXMLController implements Initializable {
                             System.out.println("createAccountButtonAction() successfully created a user.");
                             // Automatically sign in the newly created user
                             currentUserLoggedInLabel.setText("Logged in: " + email);
-                            Firebase.loggedIn = true;
-                            Firebase.currentUser.email = email;
-                            Firebase.currentUser.password = password;
+                            if(Firebase.currentUser.admin) {
+                                debugTestButton.setVisible(true);
+                            }
                             // Change screens:
                             loginScreen.setDisable(true);
                             loginScreen.setVisible(false);
