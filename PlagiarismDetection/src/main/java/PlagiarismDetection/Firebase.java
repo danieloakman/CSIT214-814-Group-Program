@@ -34,13 +34,20 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import org.apache.commons.validator.routines.EmailValidator;
 
 public class Firebase {
     static public Firestore db;
+    static public boolean isInitialised = false;
     static public User currentUser = new User();
     static public boolean loggedIn = false;
-    static public void initialise (){
+    
+    /*
+     *  Initialises the Firebase API. Returns true if successfully initialised, else returns false.
+     *  Requires an internet connection to initialise properly.
+     */
+    static public void initialise () {
         try {
             FileInputStream serviceAccount = new FileInputStream("serviceAccountKey.json");
             FirebaseOptions options = new FirebaseOptions.Builder()
@@ -50,12 +57,41 @@ public class Firebase {
                 .build();
             FirebaseApp.initializeApp(options);
             db = FirestoreClient.getFirestore();
-            
             System.out.println("Successfully initialised Firebase.");
         } catch (IOException ex) {
             System.err.println("Firebase.initialise() error: " + ex.getMessage());
         }
     }
+    
+    /*
+    *   Tests/validates the connection to Firebase by attempting to get a user by a known email
+    *   should should always be in the system.
+    */
+    /*static public void validateConnectionToFirebase () {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                this.
+                try {
+                    UserRecord user = getUserByEmail("test@test.com");
+                    if (user != null) // if the user was found
+                        isInitialised = true;
+                    else // if the user wasn't found
+                        isInitialised = true;
+                } catch (InterruptedException | ExecutionException ex) {
+                    // if an exception occurred with the test, then also return false
+                    isInitialised = false;
+                }
+                
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        
+                    }
+                });
+            }
+        }).start();
+    }*/
     
     static public void createUserWithEmailAndPassword (String email, String password) throws InterruptedException, ExecutionException {
         String uid = email.substring(0, email.indexOf("@")); // johnsmith@gmail.com becomes uid = johnsmith
@@ -143,7 +179,7 @@ public class Firebase {
     * Doesn't work yet.
     */
     static public void getDocumentFromDatabase () {
-        //asynchronously retrieve all documents
+        // asynchronously retrieve all documents
         ApiFuture<QuerySnapshot> future = db.collection("Documents").get();
         // future.get() blocks on response
         List<QueryDocumentSnapshot> documents = null;
