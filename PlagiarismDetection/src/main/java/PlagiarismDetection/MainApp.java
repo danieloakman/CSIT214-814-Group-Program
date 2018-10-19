@@ -23,6 +23,7 @@ public class MainApp extends Application {
         
         stage.setTitle("Plagiarism Detector");
         stage.setScene(scene);
+        stage.setResizable(false);
         stage.show();
     }
 

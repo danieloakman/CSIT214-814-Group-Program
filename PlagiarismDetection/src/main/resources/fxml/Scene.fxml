@@ -18,7 +18,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="PlagiarismDetection.FXMLController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="PlagiarismDetection.FXMLController">
    <children>
       <AnchorPane fx:id="loginScreen" prefHeight="528.0" prefWidth="827.0" styleClass="backgroundPanel" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -32,14 +32,14 @@
                   <Image url="@../images/blur-book-stack-books-590493.jpg" />
                </image>
             </ImageView>
-            <AnchorPane fx:id="accountLogInOrSignUpPane" layoutX="659.0" layoutY="103.0" prefHeight="551.0" prefWidth="596.0" styleClass="infoPane">
+            <AnchorPane fx:id="accountLogInOrSignUpPane" layoutX="659.0" layoutY="100.0" prefHeight="551.0" prefWidth="596.0" styleClass="infoPane">
                <children>
-                  <Button fx:id="goToCreateAccountButton" alignment="CENTER" layoutX="116.0" layoutY="197.0" mnemonicParsing="false" onAction="#goToCreateAccountButtonAction" prefHeight="39.0" prefWidth="364.0" text="Sign up with any email" textAlignment="CENTER">
+                  <Button fx:id="goToCreateAccountButton" alignment="CENTER" disable="true" layoutX="116.0" layoutY="197.0" mnemonicParsing="false" onAction="#goToCreateAccountButtonAction" prefHeight="39.0" prefWidth="364.0" text="Sign up with any email" textAlignment="CENTER">
                      <font>
                         <Font name="Corbel" size="20.0" />
                      </font>
                   </Button>
-                  <Button fx:id="goToSignInButton" alignment="CENTER" layoutX="116.0" layoutY="348.0" mnemonicParsing="false" onAction="#goToSignInButtonAction" prefHeight="39.0" prefWidth="364.0" text="Sign in">
+                  <Button fx:id="goToSignInButton" alignment="CENTER" disable="true" layoutX="116.0" layoutY="348.0" mnemonicParsing="false" onAction="#goToSignInButtonAction" prefHeight="39.0" prefWidth="364.0" text="Sign in">
                      <font>
                         <Font name="Corbel" size="20.0" />
                      </font>
@@ -54,9 +54,19 @@
                         <Font size="15.0" />
                      </font>
                   </Label>
+                  <Label fx:id="initialiseErrorLabel" layoutX="117.0" layoutY="23.0" prefHeight="106.0" prefWidth="364.0" text="Error, failed to connect to our servers. Please check your internet connect and restart the program." textFill="RED" visible="false" wrapText="true">
+                     <font>
+                        <Font name="Corbel" size="20.0" />
+                     </font>
+                  </Label>
+                  <ImageView fx:id="logInOrSignUpLoadingGif" fitHeight="40.0" fitWidth="37.0" layoutX="281.0" layoutY="257.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@../images/loading-blue.gif" />
+                     </image>
+                  </ImageView>
                </children>
             </AnchorPane>
-            <AnchorPane fx:id="createAccountPane" disable="true" layoutX="659.0" layoutY="103.0" prefHeight="551.0" prefWidth="596.0" styleClass="infoPane" visible="false">
+            <AnchorPane fx:id="createAccountPane" disable="true" layoutX="659.0" layoutY="100.0" prefHeight="551.0" prefWidth="596.0" styleClass="infoPane" visible="false">
                <children>
                   <Button fx:id="createAccountBackButton" cancelButton="true" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#createAccountBackButton" prefHeight="17.0" prefWidth="44.0" text="Back" />
                   <TextField fx:id="createAccountEmailField" layoutX="138.0" layoutY="197.0" prefHeight="44.0" prefWidth="320.0" promptText="Email">
@@ -107,7 +117,7 @@
                   </ImageView>
                </children>
             </AnchorPane>
-            <AnchorPane fx:id="signInPane" disable="true" layoutX="669.0" layoutY="113.0" prefHeight="551.0" prefWidth="596.0" styleClass="infoPane" visible="false">
+            <AnchorPane fx:id="signInPane" disable="true" layoutX="659.0" layoutY="100.0" prefHeight="551.0" prefWidth="596.0" styleClass="infoPane" visible="false">
                <children>
                   <Button fx:id="signInBackButton" cancelButton="true" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#signInBackButtonAction" prefHeight="17.0" prefWidth="44.0" text="Back" />
                   <TextField fx:id="signInEmailField" layoutX="138.0" layoutY="186.0" prefHeight="31.0" prefWidth="320.0" promptText="Email">
@@ -139,7 +149,8 @@
                   <Label layoutX="240.0" layoutY="348.0" text="Forgot your password?" underline="true">
                      <tooltip>
                         <Tooltip text="Contact an administrator." />
-                     </tooltip></Label>
+                     </tooltip>
+                  </Label>
                   <ImageView fx:id="signInLoadingGif" fitHeight="37.0" fitWidth="44.0" layoutX="344.0" layoutY="292.0" pickOnBounds="true" preserveRatio="true" visible="false">
                      <image>
                         <Image url="@../images/loading-blue.gif" />
@@ -163,14 +174,14 @@
           <children>
             <AnchorPane id="headerPane" prefHeight="52.0" prefWidth="1280.0">
                <children>
-                  <Label layoutX="505.0" layoutY="5.0" text="Plagiarism Checker">
+                  <Label layoutX="505.0" layoutY="5.0" text="Plagiarism Checker" textFill="WHITE">
                      <font>
                         <Font name="Corbel" size="34.0" />
                      </font>
                   </Label>
                   <Button fx:id="debugTestButton" layoutX="1174.0" layoutY="12.0" mnemonicParsing="false" onAction="#debugButtonAction" text="Debug/Test" />
                   <Button fx:id="mainScreenSignOutButton" layoutX="14.0" layoutY="12.0" mnemonicParsing="false" onAction="#mainScreenSignOutButtonAction" text="Sign out" />
-                  <Label layoutX="129.0" layoutY="16.0" text="Logged in: ">
+                  <Label layoutX="129.0" layoutY="16.0" text="Logged in: " textFill="WHITE">
                      <font>
                         <Font name="Corbel" size="15.0" />
                      </font>

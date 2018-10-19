@@ -1,2 +1,2 @@
 @echo OFF
-java -jar PlagiarismDetection-1.0.jar
+java -jar PlagiarismDetection-1.1.jar

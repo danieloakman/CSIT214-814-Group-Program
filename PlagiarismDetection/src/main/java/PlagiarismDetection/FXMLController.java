@@ -4,6 +4,8 @@
 
 package PlagiarismDetection;
 
+import static PlagiarismDetection.FXMLController.executor;
+import com.google.firebase.auth.UserRecord;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -19,7 +21,9 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
+import java.util.concurrent.*;
 
 public class FXMLController implements Initializable {
     @FXML
@@ -100,8 +104,13 @@ public class FXMLController implements Initializable {
     private TextArea searchTextArea;
     @FXML
     private TextArea resultsText;
+    @FXML
+    private Label initialiseErrorLabel;
+    @FXML
+    private ImageView logInOrSignUpLoadingGif;
     
     static String errorLabel;
+    static ExecutorService executor;// = Executors.newSingleThreadExecutor();
     
     @FXML
     void mainScreenSignOutButtonAction(ActionEvent event) {
@@ -389,11 +398,78 @@ public class FXMLController implements Initializable {
     @FXML
     void browseForAFileButtonAction(ActionEvent event) {
         final FileChooser fileChooser = new FileChooser();
-        
+    }
+    
+    void checkFirebaseConnection () {
+        System.out.println("called checkFirebaseConnection()");
+        executor = Executors.newSingleThreadExecutor(); // assign a new thread to executor
+        logInOrSignUpLoadingGif.setVisible(true); // turn the loading gif on
+        // run the following in a new thread:
+        new Thread(new Runnable() {
+            @Override
+            // Run this first:
+            public void run() {
+                timeoutRunnable validateFirebaseRunnable = new timeoutRunnable() {
+                    @Override
+                    public Boolean call() throws Exception { // override the abstract method call() of timeoutRunnable class
+                        try {
+                            // test connection to firebase by trying to get a known email that will always be in the database:
+                            UserRecord user = Firebase.getUserByEmail("test@test.com");
+                            if (user != null) { // if the user was found
+                                Firebase.isInitialised = true;
+                                System.out.println("Firebase test connection was successful.");
+                                return true;
+                            } else { // if the user wasn't found
+                                System.out.println("Firebase testconnection was unsuccessful.");
+                                return false;
+                            }
+                        } catch (InterruptedException | ExecutionException ex) {
+                            // if an exception occurred with the test, then also return false
+                            System.out.println("Firebase test connection was unsuccessful.");
+                            return false;
+                        }
+                    }
+                };
+                // load the validateFirebaseRunnable into the executor thread:
+                Future<Boolean> future = executor.submit(validateFirebaseRunnable);
+                try {
+                    // Run the overriden call() function above with a timeout of 5 seconds.
+                    // This means if call() isn't completed within 5 seconds from now, then interrupt it.
+                    future.get(5, TimeUnit.SECONDS);
+                } catch (InterruptedException | ExecutionException | TimeoutException ex) {
+                    // 5 seconds went by and wasn't able to fully execute call()
+                    System.out.println("Timeout exception on checking firebase connection.");
+                }
+                
+                // Run this only when the above run() is finished:
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        executor.shutdownNow(); // shut down the new thread in executor
+                        logInOrSignUpLoadingGif.setVisible(false); // turn off the loading gif
+                        if (!Firebase.isInitialised) {
+                            // show an error message and don't allow the user to continue:
+                            initialiseErrorLabel.setVisible(true);
+                        } else {
+                            // allow the user to continue:
+                            goToSignInButton.setDisable(false);
+                            goToCreateAccountButton.setDisable(false);
+                        }
+                    }
+                });
+            }
+        }).start();
     }
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        // Initialise and validate the connection to the Firebase API.
         Firebase.initialise();
+        checkFirebaseConnection();
     }
+}
+
+abstract class timeoutRunnable implements Callable<Boolean> {
+    @Override
+    abstract public Boolean call() throws Exception;
 }
