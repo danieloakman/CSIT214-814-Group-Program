@@ -5,7 +5,7 @@
 package PlagiarismDetection;
 
 import java.util.*;
-
+//Data structure for WebSearch's response from Bing Web Search
 public class WebResults {
     HashMap<String, String> relavantHeaders;
     String jsonResponse;

@@ -123,6 +123,7 @@ public class FXMLController implements Initializable {
         loginScreen.setVisible(true);
     }
     
+    //performs a search based on translated text
     @FXML
     void searchButtonAction(ActionEvent event){
         String searchText = searchTextArea.getText();

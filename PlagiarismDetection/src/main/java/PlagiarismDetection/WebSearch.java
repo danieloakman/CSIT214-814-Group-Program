@@ -22,6 +22,8 @@ public class WebSearch {
     static String results = "";
     static ArrayList<String> santitizedText;
     
+    
+    //opens a connection to Bing Web Search and gets a response
     public static WebResults Search(String term) throws Exception {
         URL url = new URL(host + path + "?q=" +  URLEncoder.encode(term, "UTF-8"));
         
@@ -45,19 +47,13 @@ public class WebSearch {
         return results;
     }
     
+    //parses json string response into Json objects, then gets the relevant strings from them to return to start
     public static ArrayList<String> parse(String json_txt){
         JsonParser parser = new JsonParser();
         JsonObject json = parser.parse(json_txt).getAsJsonObject();
         ArrayList<String> returning = new ArrayList<>();
         JsonObject wtf = json.getAsJsonObject("webPages");
         JsonArray array = wtf.getAsJsonArray("value");
-        String lol = array.get(0).getAsJsonObject().get("name").getAsString();
-        try{
-            System.out.println(array.size());
-        }
-        catch(Exception e){
-            System.out.println(lol);
-        }
         
         for(int i = 0; i < array.size(); i++){
             returning.add(array.get(i).getAsJsonObject().get("name").getAsString());
@@ -65,7 +61,7 @@ public class WebSearch {
         }
         return returning;
     }
-    
+    //Landing function for the WebSearch.
     public static void start(String searchTxt){
         if (subscriptionKey.length() != 32) {
             System.out.println("Invalid Bing Search API subscription key!");
@@ -75,8 +71,6 @@ public class WebSearch {
         
         try{
             WebResults result = Search(searchTxt);
-            
-            System.out.println(result.jsonResponse);
             
             santitizedText = parse(result.jsonResponse);
             
