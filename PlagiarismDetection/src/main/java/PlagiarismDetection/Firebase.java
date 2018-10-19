@@ -19,6 +19,7 @@ import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
+import com.google.cloud.firestore.SetOptions;
 import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -157,8 +158,16 @@ public class Firebase {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
         Document doc = new Document(title, dtf.format(now), documentText, nameOfUploader);
+        // Store doc in folder "Documents" in the database
         ApiFuture<DocumentReference> addedDocRef = db.collection("Documents").add(doc);
         try {
+            // Stores the title and Document id in the User's folder.
+            // So for example, Users/test@test.com/uploadedDocuments/addedDocRef.getId() now has a string value = title
+            HashMap<String,Object> documentMap = new HashMap<>();
+            HashMap<String,Object> uploadedDocuments = new HashMap<>();
+            documentMap.put(addedDocRef.get().getId(), title);
+            uploadedDocuments.put("uploadedDocuments", documentMap);
+            db.collection("Users").document(nameOfUploader).set(uploadedDocuments, SetOptions.merge());
             System.out.println("Added document with ID: " + addedDocRef.get().getId());
         } catch (InterruptedException | ExecutionException ex) {
             Logger.getLogger(Firebase.class.getName()).log(Level.SEVERE, null, ex);
@@ -175,9 +184,7 @@ public class Firebase {
         System.out.println("Successfully stored email and password in database.");
     }
     
-    /*
-    * Doesn't work yet.
-    */
+    
     static public void getDocumentFromDatabase () {
         // asynchronously retrieve all documents
         ApiFuture<QuerySnapshot> future = db.collection("Documents").get();
@@ -212,6 +219,7 @@ class Document {
 class User {
     public String email;
     public String password;
+    public boolean admin;
     public User () {
         email = "";
         password = "";
