@@ -35,6 +35,7 @@ import javafx.stage.Stage;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import java.util.Collections;
+import javafx.scene.layout.Pane;
 
 public class FXMLController implements Initializable {
     @FXML
@@ -141,6 +142,8 @@ public class FXMLController implements Initializable {
     static String errorLabel;
     static ExecutorService executor;
     static FileChooser fileChooser;
+    // holds the results for easy iteration
+    static ArrayList<ResultCompare> display = new ArrayList<>();
     
     @FXML
     void mainScreenSignOutButtonAction(ActionEvent event) {
@@ -163,31 +166,15 @@ public class FXMLController implements Initializable {
         loginScreen.setVisible(true);
     }
     
-    //performs a search based on translated text
+    
     //No longer connects to Debug/Text, it will need to be called at some point
     void toSearch(String translatedText){
         
-        //Starts websearch
-        WebSearch.start(translatedText);
         
-        //holds the results for easy iteration
-        ArrayList<ResultCompare> display = new ArrayList<>();
         
-        //adding results
-        for(int i = 0; i < WebSearch.santitizedText.size(); i += 2){
-            display.add(new ResultCompare(WebSearch.santitizedText.get(i), WebSearch.santitizedText.get(i+1), translatedText));
-        }
-        
-        //sort by percent see ResultCompare's compareTo method
-        Collections.sort(display);
-        
-        //shows results in UI
-        HPercent.setText(Double.toString(display.get(0).percent) + "%");
-        LPercent.setText(Double.toString((100 - display.get(0).percent)) + "%");
-        matches.setText(Integer.toString(display.size()));
-        for (int i = 0; i < display.size(); i++) {
-            finalResText.setText(finalResText.getText() + i + ". " + display.get(i).toString() + "\n");
-        }
+    }
+    @FXML
+    void searchButtonAction (ActionEvent event) {
         
     }
 
@@ -208,13 +195,46 @@ public class FXMLController implements Initializable {
         // Empty input title and text fields:
         titleField.setText("");
         inputTextArea.setText("");
-        // Change screens:
-        selectLanguageScreen.setVisible(false);
-        selectLanguageScreen.setDisable(true);
-        inputScreen.setDisable(true);
-        inputScreen.setVisible(false);
-        resultsScreen.setVisible(true);
-        resultsScreen.setDisable(false);
+        final String translatedText = translatedTextArea.getText();
+        // Run the following in a new thread:
+        new Thread(new Runnable() {
+            @Override
+            // Performs a search based on translated text:
+            public void run() {
+                // Starts websearch
+                WebSearch.start(translatedText);
+
+                // adding results
+                for(int i = 0; i < WebSearch.santitizedText.size(); i += 2){
+                    display.add(new ResultCompare(WebSearch.santitizedText.get(i), WebSearch.santitizedText.get(i+1), translatedText));
+                }
+
+                // sort by percent see ResultCompare's compareTo method
+                Collections.sort(display);
+
+                
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        //shows results in UI
+                        HPercent.setText(Double.toString(display.get(0).percent) + "%");
+                        LPercent.setText(Double.toString((100 - display.get(0).percent)) + "%");
+                        matches.setText(Integer.toString(display.size()));
+                        for (int i = 0; i < display.size(); i++) {
+                            finalResText.setText(finalResText.getText() + i + ". " + display.get(i).toString() + "\n");
+                        }
+                        // Change screens:
+                        selectLanguageScreen.setVisible(false);
+                        selectLanguageScreen.setDisable(true);
+                        inputScreen.setDisable(true);
+                        inputScreen.setVisible(false);
+                        resultsScreen.setVisible(true);
+                        resultsScreen.setDisable(false);
+                    }
+                });
+            }
+        }).start();
+        
     }
     
     /*
