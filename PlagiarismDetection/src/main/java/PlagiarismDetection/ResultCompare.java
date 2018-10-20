@@ -55,6 +55,7 @@ public class ResultCompare implements Comparable<ResultCompare>{
     
     }
     
+    //sorts array list by percentage match
     @Override
     public int compareTo(ResultCompare C){
         if(this.percent > C.percent){
