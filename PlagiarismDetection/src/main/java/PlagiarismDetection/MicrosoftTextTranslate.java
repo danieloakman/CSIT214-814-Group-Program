@@ -12,7 +12,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import javax.xml.bind.annotation.XmlElement;
 
 public class MicrosoftTextTranslate {
     final private static String SUBSCRIPTIONKEY = "fcbbf8e698214b7183d45dc5c7938739";
@@ -73,7 +72,8 @@ public class MicrosoftTextTranslate {
     }
 
     /*
-     *  This function was not written by the team. Was found on 
+     *  This function was not written by the team.
+     *  Source: https://docs.microsoft.com/en-us/azure/cognitive-services/translator/quickstart-java-translate
      */
     public String prettify(String json_text) {
         JsonParser parser = new JsonParser();

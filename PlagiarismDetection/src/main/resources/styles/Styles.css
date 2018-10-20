@@ -1,7 +1,7 @@
 .infoPane {
 /*    -fx-border-color: grey;
     -fx-border-radius: 15;*/
--fx-background-color: #ffffff;
+    -fx-background-color: #ffffff;
 }
 
 .signInButtons {
@@ -20,7 +20,7 @@
 }
 
 #headerPane {
-    -fx-background-color: #0c2340;
+    -fx-background-color: #114b5f;
     -fx-border-color: grey;
     -fx-border-width: 2;
     /*-fx-border-radius: 2;*/
