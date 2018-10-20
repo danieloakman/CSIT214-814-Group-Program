@@ -3,15 +3,12 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
-<?import javafx.scene.control.ContextMenu?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.Tooltip?>
-<?import javafx.scene.control.TreeView?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -68,7 +65,18 @@
             </AnchorPane>
             <AnchorPane fx:id="createAccountPane" disable="true" layoutX="659.0" layoutY="100.0" prefHeight="551.0" prefWidth="596.0" styleClass="infoPane" visible="false">
                <children>
-                  <Button fx:id="createAccountBackButton" cancelButton="true" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#createAccountBackButton" prefHeight="17.0" prefWidth="44.0" text="Back" />
+                  <Button fx:id="createAccountBackButton" cancelButton="true" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#createAccountBackButton" prefHeight="30.0" prefWidth="44.0">
+                     <font>
+                        <Font name="Corbel" size="12.0" />
+                     </font>
+                     <graphic>
+                        <ImageView fitHeight="26.0" fitWidth="167.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/backArrow.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
                   <TextField fx:id="createAccountEmailField" layoutX="138.0" layoutY="197.0" prefHeight="44.0" prefWidth="320.0" promptText="Email">
                      <font>
                         <Font name="Corbel" size="20.0" />
@@ -119,7 +127,17 @@
             </AnchorPane>
             <AnchorPane fx:id="signInPane" disable="true" layoutX="659.0" layoutY="100.0" prefHeight="551.0" prefWidth="596.0" styleClass="infoPane" visible="false">
                <children>
-                  <Button fx:id="signInBackButton" cancelButton="true" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#signInBackButtonAction" prefHeight="17.0" prefWidth="44.0" text="Back" />
+                  <Button fx:id="signInBackButton" cancelButton="true" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#signInBackButtonAction" prefHeight="17.0" prefWidth="44.0">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                     <graphic>
+                        <ImageView fitHeight="26.0" fitWidth="31.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/backArrow.png" />
+                           </image>
+                        </ImageView>
+                     </graphic></Button>
                   <TextField fx:id="signInEmailField" layoutX="138.0" layoutY="186.0" prefHeight="31.0" prefWidth="320.0" promptText="Email">
                      <font>
                         <Font name="Corbel" size="20.0" />
@@ -179,9 +197,9 @@
                         <Font name="Corbel" size="34.0" />
                      </font>
                   </Label>
-                  <Button fx:id="debugTestButton" layoutX="1174.0" layoutY="12.0" mnemonicParsing="false" onAction="#debugButtonAction" text="Debug/Test" />
+                  <Button fx:id="debugTestButton" layoutX="1174.0" layoutY="12.0" mnemonicParsing="false" onAction="#debugButtonAction" text="Debug/Test" visible="false" />
                   <Button fx:id="mainScreenSignOutButton" layoutX="14.0" layoutY="12.0" mnemonicParsing="false" onAction="#mainScreenSignOutButtonAction" text="Sign out" />
-                  <Label layoutX="129.0" layoutY="16.0" text="Logged in: " textFill="WHITE">
+                  <Label fx:id="currentUserLoggedInLabel" layoutX="129.0" layoutY="16.0" text="Logged in: " textFill="WHITE">
                      <font>
                         <Font name="Corbel" size="15.0" />
                      </font>
@@ -190,53 +208,84 @@
             </AnchorPane>
             <AnchorPane fx:id="inputScreen" layoutX="14.0" layoutY="69.0" prefHeight="635.0" prefWidth="607.0" styleClass="infoPane" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="659.0" AnchorPane.topAnchor="69.0">
                <children>
-                  <Button fx:id="testTranslateButton" layoutX="481.0" layoutY="530.0" mnemonicParsing="false" onAction="#testTranslateButtonAction" text="test translate" />
-                  <Label layoutX="467.0" layoutY="508.0" text="USE THIS SPARINGLY" />
-                  <TextArea fx:id="inputTextArea" layoutX="13.0" layoutY="85.0" prefHeight="253.0" prefWidth="580.0" promptText="Please insert your text here to check for plagiarism" />
-                  <Label layoutX="14.0" layoutY="349.0" text="Or upload a document:">
+                  <TextArea fx:id="inputTextArea" layoutX="11.0" layoutY="107.0" prefHeight="315.0" prefWidth="580.0" promptText="Please insert your text here to check for plagiarism" wrapText="true" />
+                  <Label layoutX="11.0" layoutY="433.0" text="Or browse for a file on your computer (must be either a .txt or .docx file):">
                      <font>
-                        <Font name="Corbel" size="17.0" />
+                        <Font name="Corbel" size="15.0" />
                      </font>
                   </Label>
-                  <TextField fx:id="filePathTextField" layoutX="13.0" layoutY="378.0" prefHeight="25.0" prefWidth="229.0" promptText="No File Chosen" />
-                  <Button fx:id="uploadButton" layoutX="461.0" layoutY="372.0" mnemonicParsing="false" onAction="#uploadButtonAction" prefWidth="88.0" text="Upload">
+                  <Button fx:id="uploadButton" layoutX="11.0" layoutY="524.0" mnemonicParsing="false" onAction="#uploadButtonAction" prefWidth="88.0" text="Upload">
                      <font>
                         <Font name="Corbel" size="20.0" />
                      </font>
                   </Button>
-                  <TextField fx:id="titleField" layoutX="14.0" layoutY="51.0" promptText="Title of document" />
-                  <Label layoutX="221.0" layoutY="14.0" text="Provide a text file:">
+                  <TextField fx:id="titleField" layoutX="11.0" layoutY="75.0" prefHeight="25.0" prefWidth="281.0" promptText="Title of document" />
+                  <Label layoutX="221.0" layoutY="14.0" text="Provide a document:">
                      <font>
                         <Font name="Corbel" size="20.0" />
                      </font>
                   </Label>
                   <Separator layoutX="11.0" layoutY="34.0" prefHeight="17.0" prefWidth="580.0" />
-                  <Button fx:id="browseForAFileButton" layoutX="250.0" layoutY="378.0" mnemonicParsing="false" onAction="#browseForAFileButtonAction" text="Browse for file" />
-                  <TreeView layoutX="14.0" layoutY="411.0" prefHeight="210.0" prefWidth="356.0" />
+                  <Button fx:id="browseForAFileButton" layoutX="11.0" layoutY="458.0" mnemonicParsing="false" onAction="#browseForAFileButtonAction" text="Browse for a file">
+                     <font>
+                        <Font name="Corbel" size="15.0" />
+                     </font></Button>
+                  <Label layoutX="13.0" layoutY="51.0" text="Manually enter the title and text:">
+                     <font>
+                        <Font name="Corbel" size="15.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="11.0" layoutY="500.0" text="When done, please upload this document:">
+                     <font>
+                        <Font name="Corbel" size="15.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="inputScreenErrorLabel" layoutX="14.0" layoutY="579.0" prefHeight="30.0" prefWidth="580.0" textFill="RED">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Label>
+                  <ImageView fx:id="uploadDocumentLoadingGif" fitHeight="40.0" fitWidth="37.0" layoutX="113.0" layoutY="524.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@../images/loading-blue.gif" />
+                     </image>
+                  </ImageView>
                </children>
             </AnchorPane>
-            <AnchorPane fx:id="selectLanguageScreen" disable="true" layoutX="633.0" layoutY="69.0" prefHeight="635.0" prefWidth="627.0" styleClass="infoPane">
+            <AnchorPane fx:id="selectLanguageScreen" disable="true" layoutX="633.0" layoutY="69.0" prefHeight="635.0" prefWidth="627.0" styleClass="infoPane" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="633.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="69.0">
                <children>
                   <Label layoutX="213.0" layoutY="14.0" text="Select target language:">
                      <font>
                         <Font name="Corbel" size="20.0" />
                      </font>
                   </Label>
-                  <ChoiceBox layoutX="233.0" layoutY="185.0" prefWidth="150.0">
-                     <contextMenu>
-                        <ContextMenu>
-                          <items>
-                            <MenuItem mnemonicParsing="false" text="something" />
-                          </items>
-                        </ContextMenu>
-                     </contextMenu>
-                  </ChoiceBox>
-                  <Button fx:id="checkForPlagiarismButton" layoutX="206.0" layoutY="280.0" mnemonicParsing="false" onAction="#checkForPlagiarismButtonAction" text="CHECK FOR PLAGIARISM">
+                  <Button fx:id="checkForPlagiarismButton" disable="true" layoutX="207.0" layoutY="451.0" mnemonicParsing="false" onAction="#checkForPlagiarismButtonAction" text="CHECK FOR PLAGIARISM">
                      <font>
                         <Font name="Arial" size="15.0" />
                      </font>
                   </Button>
                   <Separator layoutX="17.0" layoutY="37.0" prefHeight="10.0" prefWidth="596.0" />
+                  <Button fx:id="testTranslateButton" layoutX="468.0" layoutY="54.0" mnemonicParsing="false" onAction="#testTranslateButtonAction" text="Translate document">
+                     <font>
+                        <Font name="Corbel" size="15.0" />
+                     </font></Button>
+                  <ChoiceBox fx:id="targetLanguageChoiceBox" layoutX="237.0" layoutY="55.0" prefHeight="25.0" prefWidth="145.0" />
+                  <Label layoutX="17.0" layoutY="58.0" text="Choose a target language:">
+                     <font>
+                        <Font name="Corbel" size="15.0" />
+                     </font>
+                  </Label>
+                  <TextArea fx:id="translatedTextArea" editable="false" layoutX="17.0" layoutY="88.0" prefHeight="335.0" prefWidth="596.0" promptText="Translated text will appear here." wrapText="true" />
+                  <ImageView fx:id="translateTextLoadingGif" fitHeight="185.0" fitWidth="192.0" layoutX="217.0" layoutY="163.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@../images/loading-blue.gif" />
+                     </image>
+                  </ImageView>
+                  <Label fx:id="translateTextErrorLabel" layoutX="17.0" layoutY="521.0" prefHeight="37.0" prefWidth="596.0" textFill="RED">
+                     <font>
+                        <Font name="Corbel" size="20.0" />
+                     </font>
+                  </Label>
                </children>
             </AnchorPane>
             <AnchorPane fx:id="resultsScreen" disable="true" layoutX="15.0" layoutY="70.0" prefHeight="635.0" prefWidth="1247.0" styleClass="infoPane" visible="false" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="18.0" AnchorPane.topAnchor="70.0">
@@ -277,15 +326,9 @@
       <AnchorPane fx:id="debugTestScreen" disable="true" prefHeight="528.0" prefWidth="624.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <Button fx:id="exitDebug" layoutX="541.0" layoutY="14.0" mnemonicParsing="false" onAction="#exitDebugAction" text="Exit debug" />
-            <TextField layoutX="14.0" layoutY="35.0" prefHeight="25.0" prefWidth="200.0" promptText="Title" />
-            <TextArea layoutX="14.0" layoutY="85.0" prefHeight="200.0" prefWidth="200.0" promptText="Text data" />
-            <Label layoutX="14.0" layoutY="18.0" text="Store in database" />
-            <TextField layoutX="14.0" layoutY="60.0" prefHeight="25.0" prefWidth="200.0" promptText="Uploader" />
-            <Button fx:id="storeButton" layoutX="81.0" layoutY="294.0" mnemonicParsing="false" onAction="#storeButtonAction" text="Store" />
-            <TextArea layoutX="222.0" layoutY="60.0" prefHeight="226.0" prefWidth="213.0" />
-            <Label layoutX="222.0" layoutY="18.0" text="Fetch a documents from database" />
-            <Button fx:id="fetchButton" layoutX="303.0" layoutY="294.0" mnemonicParsing="false" onAction="#fetchButtonAction" text="Fetch" />
-            <TextField layoutX="222.0" layoutY="35.0" prefHeight="25.0" prefWidth="213.0" promptText="Title" />
+            <Label layoutX="14.0" layoutY="18.0" text="Fetch all documents from database:" />
+            <TextArea fx:id="testDebugTextArea" layoutX="14.0" layoutY="35.0" prefHeight="226.0" prefWidth="213.0" />
+            <Button fx:id="fetchButton" layoutX="14.0" layoutY="268.0" mnemonicParsing="false" onAction="#fetchButtonAction" text="Fetch" />
             <Button fx:id="searchButton" layoutX="14.0" layoutY="478.0" mnemonicParsing="false" onAction="#searchButtonAction" text="Search" />
             <Label layoutX="14.0" layoutY="336.0" text="Search With Bing" />
             <TextArea fx:id="searchTextArea" layoutX="14.0" layoutY="353.0" prefHeight="118.0" prefWidth="364.0" promptText="Search Text" />

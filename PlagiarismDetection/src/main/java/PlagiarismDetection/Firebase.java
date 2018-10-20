@@ -19,6 +19,7 @@ import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
+import com.google.cloud.firestore.SetOptions;
 import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -100,6 +101,8 @@ public class Firebase {
             .setEmail(email)
             .setPassword(password);
         FirebaseAuth.getInstance().createUserAsync(request).get();
+        setPasswordInDatabase(email, password);
+        setAdmin(email, false);
     }
     
     static public boolean isEmailValid (String email) {
@@ -115,13 +118,6 @@ public class Firebase {
         return FirebaseAuth.getInstance(FirebaseApp.getInstance()).getUserByEmailAsync(email).get();
     }
     
-    static public void updateUserPasswordByEmail (String email, String password) throws InterruptedException, ExecutionException {
-        UserRecord userRecord = getUserByEmail(email);
-        UpdateRequest request = new UpdateRequest(userRecord.getUid())
-            .setPassword(password);
-        FirebaseAuth.getInstance().updateUserAsync(request);
-    }
-    
     static public ArrayList<UserRecord> getAllUserRecords () throws InterruptedException, ExecutionException {
         ArrayList<UserRecord> userRecordList = new ArrayList();
         ListUsersPage page = FirebaseAuth.getInstance().listUsersAsync(null).get();
@@ -134,7 +130,14 @@ public class Firebase {
         return userRecordList;
     }
     
-    static public boolean signIn (String email, String password) throws InterruptedException, ExecutionException {
+    static public boolean signIn (String email, String password, boolean isAnAccountCreation) throws InterruptedException, ExecutionException {
+        if (isAnAccountCreation) { // if account was just created:
+            loggedIn = true;
+            currentUser.email = email;
+            currentUser.password = password;
+            currentUser.admin = false;
+            return true;
+        }
         DocumentReference docRef = db.collection("Users").document(email);
         // asynchronously retrieve the document
         ApiFuture<DocumentSnapshot> future = docRef.get();
@@ -144,6 +147,10 @@ public class Firebase {
             String passwordToMatch = data.get("password").toString();
             if (passwordToMatch.equals(password)) {
                 System.out.println("Password matches!");
+                loggedIn = true;
+                currentUser.email = email;
+                currentUser.password = password;
+                checkIfCurrentUserIsAdmin();
                 return true;
             }
         } else {
@@ -153,12 +160,50 @@ public class Firebase {
         return false;
     }
     
+    /*
+     *  Returns true if current user is an admin, false if not.
+     *  Also updates static currentUser.admin.
+     */
+    static public boolean checkIfCurrentUserIsAdmin () {
+        System.out.println("calling checkCurrentUserAdmin()");
+        DocumentReference docRef = db.collection("Users").document(currentUser.email);
+        ApiFuture<DocumentSnapshot> future = docRef.get();
+        try {
+            DocumentSnapshot user = future.get();
+            if (user.exists()) {
+                if (user.get("admin").equals(true)) { // if admin == true
+                    currentUser.admin = true;
+                    System.out.println(currentUser.email + " is an admin");
+                    return true;
+                } else { // if admin == false
+                    currentUser.admin = false;
+                    System.out.println(currentUser.email + " isn't an admin");
+                    return false;
+                }
+            } else {
+                System.out.println("No such user.");
+                return false;
+            }
+        } catch (InterruptedException | ExecutionException ex) {
+            System.out.println("chechCurrentUserAdmin() Error: " + ex.getMessage());
+            return false;
+        }
+    }
+    
     static public void storeDocumentInDatabase (String documentText, String nameOfUploader, String title) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
         Document doc = new Document(title, dtf.format(now), documentText, nameOfUploader);
+        // Store doc in folder "Documents" in the database
         ApiFuture<DocumentReference> addedDocRef = db.collection("Documents").add(doc);
         try {
+            // Stores the title and Document id in the User's folder.
+            // So for example, Users/test@test.com/uploadedDocuments/addedDocRef.getId() now has a string value = title
+            HashMap<String,Object> documentMap = new HashMap<>();
+            HashMap<String,Object> uploadedDocuments = new HashMap<>();
+            documentMap.put(addedDocRef.get().getId(), title);
+            uploadedDocuments.put("uploadedDocuments", documentMap);
+            db.collection("Users").document(nameOfUploader).set(uploadedDocuments, SetOptions.merge());
             System.out.println("Added document with ID: " + addedDocRef.get().getId());
         } catch (InterruptedException | ExecutionException ex) {
             Logger.getLogger(Firebase.class.getName()).log(Level.SEVERE, null, ex);
@@ -166,19 +211,23 @@ public class Firebase {
     }
     
     /*
-    *   For signing in the user later.
+    *   Set the user's password to the new parameter "password" in the database.
     */
-    static public void storePasswordInDatabase (String email, String password) {
+    static public void setPasswordInDatabase (String email, String password) {
         HashMap<String, String> data = new HashMap<>();
         data.put("password", password);
         db.collection("Users").document(email).set(data);
-        System.out.println("Successfully stored email and password in database.");
+        System.out.println("Successfully set email and password in database.");
     }
     
-    /*
-    * Doesn't work yet.
-    */
-    static public void getDocumentFromDatabase () {
+    static public void setAdmin (String email, boolean adminStatus) {
+        HashMap<String, Boolean> data = new HashMap<>();
+        data.put("admin", adminStatus);
+        db.collection("Users").document(email).set(data);
+        System.out.println("Successfully set admin status for user: " + email + ".");
+    }
+    
+    static public void getAllDocumentsFromDatabase () {
         // asynchronously retrieve all documents
         ApiFuture<QuerySnapshot> future = db.collection("Documents").get();
         // future.get() blocks on response
@@ -212,6 +261,7 @@ class Document {
 class User {
     public String email;
     public String password;
+    public boolean admin;
     public User () {
         email = "";
         password = "";
