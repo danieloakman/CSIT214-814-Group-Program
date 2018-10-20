@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
@@ -12,7 +11,6 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="PlagiarismDetection.FXMLController">
@@ -51,7 +49,7 @@
                         <Font size="15.0" />
                      </font>
                   </Label>
-                  <Label fx:id="initialiseErrorLabel" layoutX="117.0" layoutY="23.0" prefHeight="106.0" prefWidth="364.0" text="Error, failed to connect to our servers. Please check your internet connect and restart the program." textFill="RED" visible="false" wrapText="true">
+                  <Label fx:id="initialiseErrorLabel" layoutX="116.0" layoutY="413.0" prefHeight="106.0" prefWidth="364.0" text="Error, failed to connect to our servers. Please check your internet connect and restart the program." textFill="RED" visible="false" wrapText="true">
                      <font>
                         <Font name="Corbel" size="20.0" />
                      </font>
@@ -61,6 +59,16 @@
                         <Image url="@../images/loading-blue.gif" />
                      </image>
                   </ImageView>
+                  <ImageView fitHeight="164.0" fitWidth="165.0" layoutX="24.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/alphalogov1.0.png" />
+                     </image>
+                  </ImageView>
+                  <Label layoutX="161.0" layoutY="85.0" text=", the cross-language plagiarism detection tool">
+                     <font>
+                        <Font name="Corbel" size="22.0" />
+                     </font>
+                  </Label>
                </children>
             </AnchorPane>
             <AnchorPane fx:id="createAccountPane" disable="true" layoutX="659.0" layoutY="100.0" prefHeight="551.0" prefWidth="596.0" styleClass="infoPane" visible="false">
@@ -214,7 +222,7 @@
                         <Font name="Corbel" size="15.0" />
                      </font>
                   </Label>
-                  <Button fx:id="uploadButton" layoutX="11.0" layoutY="524.0" mnemonicParsing="false" onAction="#uploadButtonAction" prefWidth="88.0" text="Upload">
+                  <Button fx:id="uploadButton" layoutX="11.0" layoutY="524.0" mnemonicParsing="false" onAction="#uploadButtonAction" text="Upload">
                      <font>
                         <Font name="Corbel" size="20.0" />
                      </font>
@@ -259,23 +267,23 @@
                         <Font name="Corbel" size="20.0" />
                      </font>
                   </Label>
-                  <Button fx:id="checkForPlagiarismButton" disable="true" layoutX="234.0" layoutY="452.0" mnemonicParsing="false" onAction="#checkForPlagiarismButtonAction" text="Check for Plagiarism">
+                  <Button fx:id="checkForPlagiarismButton" layoutX="216.0" layoutY="448.0" mnemonicParsing="false" onAction="#checkForPlagiarismButtonAction" text="Check for Plagiarism">
                      <font>
-                        <Font name="Arial" size="15.0" />
+                        <Font name="Corbel" size="20.0" />
                      </font>
                   </Button>
                   <Separator layoutX="17.0" layoutY="37.0" prefHeight="10.0" prefWidth="596.0" />
-                  <Button fx:id="testTranslateButton" layoutX="468.0" layoutY="54.0" mnemonicParsing="false" onAction="#testTranslateButtonAction" text="Translate document">
+                  <Button fx:id="translateButton" layoutX="468.0" layoutY="54.0" mnemonicParsing="false" onAction="#translateButtonAction" text="Translate document">
                      <font>
                         <Font name="Corbel" size="15.0" />
                      </font></Button>
-                  <ChoiceBox fx:id="targetLanguageChoiceBox" layoutX="237.0" layoutY="55.0" prefHeight="25.0" prefWidth="145.0" />
-                  <Label layoutX="17.0" layoutY="58.0" text="Choose a target language:">
+                  <ChoiceBox fx:id="targetLanguageChoiceBox" layoutX="257.0" layoutY="56.0" prefHeight="25.0" prefWidth="145.0" />
+                  <Label layoutX="17.0" layoutY="58.0" text="Choose a target language (optional):">
                      <font>
                         <Font name="Corbel" size="15.0" />
                      </font>
                   </Label>
-                  <TextArea fx:id="translatedTextArea" editable="false" layoutX="17.0" layoutY="88.0" prefHeight="335.0" prefWidth="596.0" promptText="Translated text will appear here." wrapText="true" />
+                  <TextArea fx:id="translatedTextArea" editable="false" layoutX="17.0" layoutY="88.0" prefHeight="335.0" prefWidth="596.0" promptText="The translation will appear here." wrapText="true" />
                   <ImageView fx:id="translateTextLoadingGif" fitHeight="185.0" fitWidth="192.0" layoutX="217.0" layoutY="163.0" pickOnBounds="true" preserveRatio="true" visible="false">
                      <image>
                         <Image url="@../images/loading-blue.gif" />
@@ -286,39 +294,61 @@
                         <Font name="Corbel" size="20.0" />
                      </font>
                   </Label>
-               </children>
-            </AnchorPane>
-            <AnchorPane fx:id="resultsScreen" disable="true" layoutX="15.0" layoutY="70.0" prefHeight="635.0" prefWidth="1247.0" styleClass="infoPane" visible="false" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="18.0" AnchorPane.topAnchor="70.0">
-               <children>
-                  <Label fx:id="HP" layoutX="235.0" layoutY="71.0" prefHeight="17.0" prefWidth="91.0" />
-                  <Label layoutX="591.0" layoutY="14.0" text="Results:">
+                  <ImageView fx:id="checkingForPlagiarismLoadingGif" fitHeight="56.0" fitWidth="44.0" layoutX="424.0" layoutY="444.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@../images/loading-blue.gif" />
+                     </image>
+                  </ImageView>
+                  <Label layoutX="17.0" layoutY="457.0" text="And/or check for plagiarism:">
                      <font>
-                        <Font name="Corbel" size="20.0" />
+                        <Font name="Corbel" size="15.0" />
                      </font>
                   </Label>
-                  <Label layoutX="161.0" layoutY="71.0" text="Plagiarised: " />
-                  <Label fx:id="HPercent" layoutX="368.0" layoutY="71.0" text="Unique: " />
-                  <Pane layoutX="51.0" layoutY="120.0" style="-fx-border-style: dotted;" AnchorPane.bottomAnchor="134.0" AnchorPane.leftAnchor="51.0" AnchorPane.rightAnchor="51.0" AnchorPane.topAnchor="120.0">
-                     <children>
-                        <Label layoutX="14.0" layoutY="26.0" text="Sources Matched: " />
-                        <TextArea fx:id="finalResText" editable="false" layoutX="11.0" layoutY="53.0" prefHeight="200.0" prefWidth="500.0" promptText="text will be here, non editable" />
-                        <Label layoutX="14.0" layoutY="6.0" text="Document View">
-                           <font>
-                              <Font name="Arial Bold" size="15.0" />
-                           </font>
-                        </Label>
-                        <Label fx:id="matches" layoutX="112.0" layoutY="26.0" prefHeight="17.0" prefWidth="44.0" />
-                        <Button fx:id="startNewCheckButton" layoutX="148.0" layoutY="294.0" mnemonicParsing="false" onAction="#startNewCheckButtonAction" text="START NEW CHECK">
-                           <font>
-                              <Font size="18.0" />
-                           </font>
-                        </Button>
-                     </children>
-                     <padding>
-                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                     </padding>
-                  </Pane>
+               </children>
+            </AnchorPane>
+            <AnchorPane fx:id="resultsScreen" disable="true" layoutX="15.0" layoutY="70.0" prefHeight="635.0" prefWidth="1247.0" styleClass="infoPane" visible="false">
+               <children>
+                  <Label fx:id="HP" layoutX="235.0" layoutY="71.0" prefHeight="17.0" prefWidth="91.0" />
+                  <Label layoutX="580.0" layoutY="8.0" text="Results:">
+                     <font>
+                        <Font name="Corbel Bold" size="25.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="highestMatchedPercentageLabel" layoutX="649.0" layoutY="115.0" text="Highest matched:">
+                     <font>
+                        <Font name="Corbel Italic" size="15.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="uniquePercentageLabel" layoutX="883.0" layoutY="115.0" text="Unique: ">
+                     <font>
+                        <Font name="Corbel Italic" size="15.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="861.0" layoutY="53.0" text="Web sources matched: ">
+                     <font>
+                        <Font name="Corbel Bold" size="15.0" />
+                     </font>
+                  </Label>
+                  <TextArea fx:id="webSourcesMatchedTextArea" editable="false" layoutX="639.0" layoutY="182.0" prefHeight="395.0" prefWidth="596.0" wrapText="true" />
+                  <Label layoutX="168.0" layoutY="53.0" text="Your document with highlighted similarities:">
+                     <font>
+                        <Font name="Corbel Bold" size="15.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="matches" layoutX="163.0" layoutY="146.0" prefHeight="17.0" prefWidth="44.0" />
                   <Label fx:id="LPercent" layoutX="412.0" layoutY="71.0" prefHeight="17.0" prefWidth="52.0" />
+                  <Button fx:id="startNewCheckButton" layoutX="534.0" layoutY="589.0" mnemonicParsing="false" onAction="#startNewCheckButtonAction" text="START NEW CHECK">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Button>
+                  <Separator layoutX="14.0" layoutY="39.0" prefHeight="14.0" prefWidth="1225.0" />
+                  <TextArea fx:id="documentSimilaritiesTextArea" editable="false" layoutX="14.0" layoutY="80.0" prefHeight="497.0" prefWidth="596.0" wrapText="true" />
+                  <Label fx:id="numberOfMatchesLabel" layoutX="1071.0" layoutY="115.0" text="Number of matches:">
+                     <font>
+                        <Font name="Corbel Italic" size="15.0" />
+                     </font>
+                  </Label>
                </children>
             </AnchorPane>
           </children>

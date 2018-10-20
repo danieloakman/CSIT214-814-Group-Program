@@ -17,7 +17,7 @@ public class MicrosoftTextTranslate {
     final private static String SUBSCRIPTIONKEY = "fcbbf8e698214b7183d45dc5c7938739";
     final private static String HOST = "https://api.cognitive.microsofttranslator.com";
     final private static String PATH = "/translate?api-version=3.0";
-    public String params;
+    public static String params;
     public String translatedText = "";
 
     public static class RequestBody {
@@ -103,6 +103,9 @@ public class MicrosoftTextTranslate {
                 break;
             case "Chinese Traditional":
                 params = "&to=zh-Hant";
+                break;
+            case "English":
+                params = "&to=en";
                 break;
             case "French":
                 params = "&to=fr";

@@ -22,8 +22,7 @@ public class WebSearch {
     static String results = "";
     static ArrayList<String> santitizedText;
     
-    
-    //opens a connection to Bing Web Search and gets a response
+    // opens a connection to Bing Web Search and gets a response
     public static WebResults Search(String term) throws Exception {
         URL url = new URL(host + path + "?q=" +  URLEncoder.encode(term, "UTF-8"));
         
@@ -47,8 +46,9 @@ public class WebSearch {
         return results;
     }
     
-    //parses json string response into Json objects, then gets the relevant strings from them to return to start
+    // parses json string response into Json objects, then gets the relevant strings from them to return to start
     public static ArrayList<String> parse(String json_txt){
+        System.out.println(json_txt);
         JsonParser parser = new JsonParser();
         JsonObject json = parser.parse(json_txt).getAsJsonObject();
         ArrayList<String> returning = new ArrayList<>();
@@ -58,22 +58,22 @@ public class WebSearch {
         for(int i = 0; i < array.size(); i++){
             returning.add(array.get(i).getAsJsonObject().get("name").getAsString());
             returning.add(array.get(i).getAsJsonObject().get("snippet").getAsString());
+            returning.add(array.get(i).getAsJsonObject().get("url").getAsString());
+            returning.add(array.get(i).getAsJsonObject().get("language").getAsString());
         }
         return returning;
     }
-    //Landing function for the WebSearch.
+    
+    // Landing function for the WebSearch.
     public static void start(String searchTxt){
         if (subscriptionKey.length() != 32) {
             System.out.println("Invalid Bing Search API subscription key!");
             System.out.println("Please paste yours into the source code.");
             System.exit(1);
         }
-        
         try{
             WebResults result = Search(searchTxt);
-            
             santitizedText = parse(result.jsonResponse);
-            
         }
         catch(Exception e){
             e.printStackTrace(System.out);

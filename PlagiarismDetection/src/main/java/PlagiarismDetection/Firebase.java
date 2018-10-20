@@ -188,7 +188,7 @@ public class Firebase {
     static public void storeDocumentInDatabase (String documentText, String nameOfUploader, String title) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
-        Document doc = new Document(title, dtf.format(now), documentText, nameOfUploader);
+        FirebaseDocument doc = new FirebaseDocument(title, dtf.format(now), documentText, nameOfUploader);
         // Store doc in folder "Documents" in the database
         ApiFuture<DocumentReference> addedDocRef = db.collection("Documents").add(doc);
         try {
@@ -239,13 +239,13 @@ public class Firebase {
     }
 }
 
-class Document {
+class FirebaseDocument {
     public String timeOfUpload;
     public String text;
     public String uploader;
     public String title;
 
-    public Document (String title ,String timeOfUpload, String text, String uploader) {
+    public FirebaseDocument (String title ,String timeOfUpload, String text, String uploader) {
         this.title = title;
         this.timeOfUpload = timeOfUpload;
         this.text = text;

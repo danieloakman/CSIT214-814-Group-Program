@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +37,8 @@ import javafx.stage.Stage;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import java.util.Collections;
-import javafx.scene.layout.Pane;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 public class FXMLController implements Initializable {
     @FXML
@@ -81,7 +84,7 @@ public class FXMLController implements Initializable {
     @FXML
     private Button mainScreenSignOutButton;
     @FXML
-    private Button testTranslateButton;
+    private Button translateButton;
     @FXML
     private TextArea inputTextArea;
     @FXML
@@ -111,13 +114,13 @@ public class FXMLController implements Initializable {
     @FXML
     private TextArea searchTextArea;
     @FXML
-    private TextArea finalResText;
+    private TextArea webSourcesMatchedTextArea;
     @FXML
-    private Label HPercent;
+    private Label highestMatchedPercentageLabel;
     @FXML
-    private Label LPercent;
+    private Label uniquePercentageLabel;
     @FXML
-    private Label matches;
+    private Label numberOfMatchesLabel;
     @FXML
     private Label initialiseErrorLabel;
     @FXML
@@ -138,12 +141,16 @@ public class FXMLController implements Initializable {
     private Label translateTextErrorLabel;
     @FXML
     private TextArea testDebugTextArea;
+    @FXML
+    private ImageView checkingForPlagiarismLoadingGif;
+    @FXML
+    private TextArea documentSimilaritiesTextArea;
     
     static String errorLabel;
     static ExecutorService executor;
     static FileChooser fileChooser;
-    // holds the results for easy iteration
-    static ArrayList<ResultCompare> display = new ArrayList<>();
+//    PlagiarismResults pResults = new PlagiarismResults();
+    public ArrayList<ResultCompare> results = new ArrayList<>();
     
     @FXML
     void mainScreenSignOutButtonAction(ActionEvent event) {
@@ -154,11 +161,10 @@ public class FXMLController implements Initializable {
         // reset UI
         currentUserLoggedInLabel.setText("Logged in:");
         debugTestButton.setVisible(false);
-        titleField.setText("");
-        inputTextArea.setText("");
+        titleField.clear();
+        inputTextArea.clear();
         selectLanguageScreen.setDisable(true);
-        checkForPlagiarismButton.setDisable(true);
-        translatedTextArea.setText("");
+        translatedTextArea.clear();
         // change screens:
         mainScreen.setDisable(true);
         mainScreen.setVisible(false);
@@ -166,13 +172,6 @@ public class FXMLController implements Initializable {
         loginScreen.setVisible(true);
     }
     
-    
-    //No longer connects to Debug/Text, it will need to be called at some point
-    void toSearch(String translatedText){
-        
-        
-        
-    }
     @FXML
     void searchButtonAction (ActionEvent event) {
         
@@ -186,43 +185,80 @@ public class FXMLController implements Initializable {
         selectLanguageScreen.setVisible(true);
         inputScreen.setDisable(false);
         inputScreen.setVisible(true);
-        translatedTextArea.setText("");
+        // clear the results screen:
+        translatedTextArea.clear();
+        results.clear();
+        webSourcesMatchedTextArea.clear();
+        documentSimilaritiesTextArea.clear();
+        // Empty input title and text fields:
+        titleField.clear();
+        inputTextArea.clear();
     }
     
     @FXML
     void checkForPlagiarismButtonAction(ActionEvent event) {
         System.out.println("Checking for plagiarism...");
-        // Empty input title and text fields:
-        titleField.setText("");
-        inputTextArea.setText("");
-        final String translatedText = translatedTextArea.getText();
+        checkingForPlagiarismLoadingGif.setVisible(true);
+        final String textToCompare;
+        if (translatedTextArea.getText().isEmpty()) // if the user didn't translate their document, this would be empty
+            textToCompare = inputTextArea.getText().replaceAll("\n", " ");
+        else
+            textToCompare = translatedTextArea.getText();
         // Run the following in a new thread:
         new Thread(new Runnable() {
             @Override
             // Performs a search based on translated text:
             public void run() {
                 // Starts websearch
-                WebSearch.start(translatedText);
-
-                // adding results
-                for(int i = 0; i < WebSearch.santitizedText.size(); i += 2){
-                    display.add(new ResultCompare(WebSearch.santitizedText.get(i), WebSearch.santitizedText.get(i+1), translatedText));
+                WebSearch.start(textToCompare);
+                // Adds results
+                for(int i = 0; i < WebSearch.santitizedText.size(); i += 4){
+                    // The percentage calculated from these (as of now) are how much of the search result snippet has in comparison with textToCompare
+                    results.add(new ResultCompare(
+                            WebSearch.santitizedText.get(i),
+                            WebSearch.santitizedText.get(i+1),
+                            textToCompare,
+                            WebSearch.santitizedText.get(i+2),
+                            WebSearch.santitizedText.get(i+3)
+                    ));
                 }
-
-                // sort by percent see ResultCompare's compareTo method
-                Collections.sort(display);
-
+                // Delete any results that have 0% match
+                for (int i = 0; i < results.size(); i++) {
+                    if (results.get(i).percent == 0)
+                        results.remove(i);
+                }
+                
+                // Sort by percent, see ResultCompare's compareTo method
+                Collections.sort(results);
+                
+                // Look through top 3 (or less) web pages with the highest comparison percentage and further compare through the whole webpage
+                for (int i = 0; i < results.size(); i++) {
+                    try {
+                        URL webpageUrl = new URL(results.get(i).url);
+                        BufferedReader in = new BufferedReader(new InputStreamReader(webpageUrl.openStream())); 
+                        String st, webpageContents = ""; 
+                        while ((st = in.readLine()) != null) {
+//                            System.out.println(st);
+                            webpageContents += st;
+                        }
+                        in.close();
+                        // Parse the raw html webpage into a usable string:
+                        Document doc = Jsoup.parse(webpageContents);
+                        System.out.println(doc.getElementsByTag("p"));
+                        // Get the new percentage result from the full webpage:
+                        results.get(i).percent = ResultCompare.calcPercent(webpageContents, textToCompare);
+                    } catch (MalformedURLException ex) {
+                        System.out.println(ex);
+                    } catch (IOException ex) {
+                        System.out.println(ex);
+                    }
+                }
                 
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-                        //shows results in UI
-                        HPercent.setText(Double.toString(display.get(0).percent) + "%");
-                        LPercent.setText(Double.toString((100 - display.get(0).percent)) + "%");
-                        matches.setText(Integer.toString(display.size()));
-                        for (int i = 0; i < display.size(); i++) {
-                            finalResText.setText(finalResText.getText() + i + ". " + display.get(i).toString() + "\n");
-                        }
+                        // turn off loading gif
+                        checkingForPlagiarismLoadingGif.setVisible(false);
                         // Change screens:
                         selectLanguageScreen.setVisible(false);
                         selectLanguageScreen.setDisable(true);
@@ -230,6 +266,25 @@ public class FXMLController implements Initializable {
                         inputScreen.setVisible(false);
                         resultsScreen.setVisible(true);
                         resultsScreen.setDisable(false);
+                        // shows results in UI
+                        if (!results.isEmpty()) {
+                            highestMatchedPercentageLabel.setText("Highest match: " + Double.toString(Math.round(results.get(0).percent)) + "%");
+                            uniquePercentageLabel.setText("Unique: " + Double.toString(Math.round(100 - results.get(0).percent)) + "%");
+                            numberOfMatchesLabel.setText("Number of matches: " + Integer.toString(results.size()));
+                            documentSimilaritiesTextArea.setText(textToCompare);
+                            for (int i = 0; i < results.size(); i++) {
+                                webSourcesMatchedTextArea.setText(
+                                    webSourcesMatchedTextArea.getText() +
+                                    (i+1) + " - " + results.get(i).percent + "% match. " + results.get(i).toString() + "\n"
+                                );
+                            }
+                        } else { // if no search results had any similarities
+                            highestMatchedPercentageLabel.setText("Highest match: 0%");
+                            uniquePercentageLabel.setText("Unique: 100%");
+                            numberOfMatchesLabel.setText("Number of matches: 0");
+                            documentSimilaritiesTextArea.setText(textToCompare);
+                            webSourcesMatchedTextArea.setText("No similar articles found on the web.");
+                        }
                     }
                 });
             }
@@ -273,7 +328,7 @@ public class FXMLController implements Initializable {
     }
     
     @FXML
-    void testTranslateButtonAction(ActionEvent event) {
+    void translateButtonAction(ActionEvent event) {
         translateTextErrorLabel.setText("");
         final MicrosoftTextTranslate translator = new MicrosoftTextTranslate();
         final String text = inputTextArea.getText();
@@ -305,7 +360,6 @@ public class FXMLController implements Initializable {
                             System.out.println("Successfully translated text!");
                             System.out.println("After translation:\n" + translator.prettify(translator.translatedText));
                             translatedTextArea.setText(translator.getTextFromJson(translator.translatedText));
-                            checkForPlagiarismButton.setDisable(false);
                         } else {
                             System.out.println("Something went wrong, translatedText is empty.");
                             translateTextErrorLabel.setText("Error, failed to translate.");
@@ -441,8 +495,8 @@ public class FXMLController implements Initializable {
                                 debugTestButton.setVisible(true);
                             }
                             signInErrorLabel.setText("");
-                            signInEmailField.setText("");
-                            signInPasswordField.setText("");
+                            signInEmailField.clear();
+                            signInPasswordField.clear();
                             signInLoadingGif.setVisible(false);
                             // change screens:
                             loginScreen.setDisable(true);
@@ -516,7 +570,7 @@ public class FXMLController implements Initializable {
                         if (errorLabel.isEmpty()) { // If there was no errors, meaning it was a successful account creation attempt
                             createAccountErrorLabel.setText("");
                             createAccountEmailField.setText("");
-                            createAccountPasswordField.setText("");
+                            createAccountPasswordField.clear();
                             System.out.println("createAccountButtonAction() successfully created a user.");
                             // Automatically sign in the newly created user
                             currentUserLoggedInLabel.setText("Logged in: " + email);
@@ -653,12 +707,16 @@ public class FXMLController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+//        String text2 = "... England, on 13 May 1787 to found the penal colony ... of two Royal Navy vessels, three store ships and ... to Rio de Janeiro, then east to Cape Town and via ...";
+//        String text1 = "The First Fleet was the 11 ships that departed from Portsmouth, England, on 13 May 1787 to found the penal colony that became the first European settlement in Australia. The Fleet consisted of two Royal Navy vessels, three store ships and six convict transports, carrying between 1,000 and 1,500 convicts, marines, seamen, civil officers and free people (accounts differ on the numbers), and a large quantity of stores. From England, the Fleet sailed southwest to Rio de Janeiro, then east to Cape Town and via the Great Southern Ocean to Botany Bay, arriving over the period of 18 to 20 January 1788, taking 250 to 252 days from departure to final arrival. ";
+//        ResultCompare.calcPercent(text1, text2);
+        
         // Initialise and validate the connection to the Firebase API.
         Firebase.initialise();
         checkFirebaseConnection();
         targetLanguageChoiceBox.setItems(FXCollections.observableArrayList(
             "Arabic", "Chinese Simplified", "Chinese Traditional",
-            "French", "German", "Hindi",
+            "English", "French", "German", "Hindi",
             "Italian", "Russian", "Spanish"
         ));
     }
