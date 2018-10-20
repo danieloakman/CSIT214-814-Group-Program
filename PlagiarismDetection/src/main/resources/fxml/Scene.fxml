@@ -259,7 +259,7 @@
                         <Font name="Corbel" size="20.0" />
                      </font>
                   </Label>
-                  <Button fx:id="checkForPlagiarismButton" disable="true" layoutX="207.0" layoutY="451.0" mnemonicParsing="false" onAction="#checkForPlagiarismButtonAction" text="CHECK FOR PLAGIARISM">
+                  <Button fx:id="checkForPlagiarismButton" disable="true" layoutX="234.0" layoutY="452.0" mnemonicParsing="false" onAction="#checkForPlagiarismButtonAction" text="Check for Plagiarism">
                      <font>
                         <Font name="Arial" size="15.0" />
                      </font>
@@ -291,14 +291,14 @@
             <AnchorPane fx:id="resultsScreen" disable="true" layoutX="15.0" layoutY="70.0" prefHeight="635.0" prefWidth="1247.0" styleClass="infoPane" visible="false" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="18.0" AnchorPane.topAnchor="70.0">
                <children>
                   <Label fx:id="HP" layoutX="235.0" layoutY="71.0" prefHeight="17.0" prefWidth="91.0" />
-                  <Label layoutX="235.0" layoutY="21.0" text="RESULTS">
+                  <Label layoutX="591.0" layoutY="14.0" text="Results:">
                      <font>
-                        <Font name="Arial Black" size="30.0" />
+                        <Font name="Corbel" size="20.0" />
                      </font>
                   </Label>
                   <Label layoutX="161.0" layoutY="71.0" text="Plagiarised: " />
-                  <Label layoutX="368.0" layoutY="71.0" text="Unique: " />
-                  <Pane fx:id="HPercent" layoutX="51.0" layoutY="120.0" style="-fx-border-style: dotted;" AnchorPane.bottomAnchor="134.0" AnchorPane.leftAnchor="51.0" AnchorPane.rightAnchor="51.0" AnchorPane.topAnchor="120.0">
+                  <Label fx:id="HPercent" layoutX="368.0" layoutY="71.0" text="Unique: " />
+                  <Pane layoutX="51.0" layoutY="120.0" style="-fx-border-style: dotted;" AnchorPane.bottomAnchor="134.0" AnchorPane.leftAnchor="51.0" AnchorPane.rightAnchor="51.0" AnchorPane.topAnchor="120.0">
                      <children>
                         <Label layoutX="14.0" layoutY="26.0" text="Sources Matched: " />
                         <TextArea fx:id="finalResText" editable="false" layoutX="11.0" layoutY="53.0" prefHeight="200.0" prefWidth="500.0" promptText="text will be here, non editable" />
