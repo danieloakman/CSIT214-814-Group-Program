@@ -8,6 +8,7 @@ import static PlagiarismDetection.FXMLController.executor;
 import com.google.firebase.auth.UserRecord;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
 import javafx.application.Platform;
@@ -103,7 +104,13 @@ public class FXMLController implements Initializable {
     @FXML
     private TextArea searchTextArea;
     @FXML
-    private TextArea resultsText;
+    private TextArea finalResText;
+    @FXML
+    private Label HPercent;
+    @FXML
+    private Label LPercent;
+    @FXML
+    private Label matches;
     @FXML
     private Label initialiseErrorLabel;
     @FXML
@@ -124,18 +131,26 @@ public class FXMLController implements Initializable {
     }
     
     //performs a search based on translated text
-    @FXML
-    void searchButtonAction(ActionEvent event){
-        String searchText = searchTextArea.getText();
-        WebSearch.start(searchText);
+    //No longer connects to Debug/Text, it will need to be called at some point
+    void toSearch(String translatedText){
+        
+        WebSearch.start(translatedText);
         ArrayList<ResultCompare> display = new ArrayList<>();
         
         for(int i = 0; i < WebSearch.santitizedText.size(); i += 2){
-            display.add(new ResultCompare(WebSearch.santitizedText.get(i), WebSearch.santitizedText.get(i+1)));
+            display.add(new ResultCompare(WebSearch.santitizedText.get(i), WebSearch.santitizedText.get(i+1), translatedText));
         }
         
+        Collections.sort(display);
+        
+        HPercent.setText(Double.toString(display.get(0).percent) + "%");
+        
+        LPercent.setText(Double.toString((100 - display.get(0).percent)) + "%");
+        
+        matches.setText(Integer.toString(display.size()));
+        
         for (int i = 0; i < display.size(); i++) {
-            resultsText.setText(resultsText.getText() + i + ". " + display.get(i).toString() + "\n");
+            finalResText.setText(finalResText.getText() + i + ". " + display.get(i).toString() + "\n");
         }
         
     }

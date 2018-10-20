@@ -5,19 +5,17 @@
 package PlagiarismDetection;
 
 
-public class ResultCompare {
+public class ResultCompare implements Comparable<ResultCompare>{
     String title;
     String content;
     double percent;
     
-    ResultCompare(String title, String content){
+    ResultCompare(String title, String content, String compContent){
         this.content = content;
         this.title = title;
         
-        double titlePercent = calcPercent(title);
-        double contentPercent = calcPercent(content);
+        this.percent =  calcPercent(content, compContent);
         
-        this.percent = (titlePercent + contentPercent) / 2;
     }
     
     /*
@@ -25,9 +23,8 @@ public class ResultCompare {
     https://stackoverflow.com/questions/16840503/how-to-compare-2-strings-and-find-the-difference-in-percentage
     */
     
-    static double calcPercent(String content){
-        double percentContent = 0;
-        String comparativeContent = "";
+    static double calcPercent(String content, String comparativeContent){
+        double percentContent;
 
         if(content.equals(comparativeContent)){
             return 100;
@@ -54,7 +51,18 @@ public class ResultCompare {
     
     @Override
     public String toString(){
-        return title + "        " + percent + "\n" + content;
+        return title + "\n" + content;
     
+    }
+    
+    @Override
+    public int compareTo(ResultCompare C){
+        if(this.percent > C.percent){
+            return 1;
+        } else if(this.percent < C.percent){
+            return -1;
+        } else {
+            return 0;
+        }
     }
 }
