@@ -19,6 +19,7 @@ public class WebSearch {
     static String host = "https://api.cognitive.microsoft.com";
     static String path = "/bing/v7.0/search";
     static String searchTerm;
+    static String language = "en";
     static String results = "";
     static ArrayList<String> santitizedText;
     
@@ -53,13 +54,17 @@ public class WebSearch {
         JsonObject json = parser.parse(json_txt).getAsJsonObject();
         ArrayList<String> returning = new ArrayList<>();
         JsonObject wtf = json.getAsJsonObject("webPages");
-        JsonArray array = wtf.getAsJsonArray("value");
-        
+        JsonArray array = new JsonArray();
+        try {
+            array = wtf.getAsJsonArray("value");
+        } catch (Exception ex) {
+            System.out.println("No search results found");
+//            System.out.println(ex);
+        }
         for(int i = 0; i < array.size(); i++){
             returning.add(array.get(i).getAsJsonObject().get("name").getAsString());
             returning.add(array.get(i).getAsJsonObject().get("snippet").getAsString());
             returning.add(array.get(i).getAsJsonObject().get("url").getAsString());
-            returning.add(array.get(i).getAsJsonObject().get("language").getAsString());
         }
         return returning;
     }
@@ -80,4 +85,12 @@ public class WebSearch {
             System.exit(1);
         }
     }
+    
+//    static public String getLanguage(String str) {
+//        switch(str) {
+//            case "":
+//                return 
+//            case "English":
+//        }
+//    }
 }

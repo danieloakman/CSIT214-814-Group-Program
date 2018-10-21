@@ -92,18 +92,20 @@ public class MicrosoftTextTranslate {
     
     /*
      *  Set the params global variable to be used in the next text translation.
+     *  Unfortunately, some of these languages can't be used as of right now, because
+     *  they're characters can't be handled by the matching algorithm.
      */
     public void setParams (String str) {
         switch (str) {
-            case "Arabic":
-                params = "&to=ar";
-                break;
-            case "Chinese Simplified":
-                params = "&to=zh-Hans";
-                break;
-            case "Chinese Traditional":
-                params = "&to=zh-Hant";
-                break;
+//            case "Arabic":
+//                params = "&to=ar";
+//                break;
+//            case "Chinese Simplified":
+//                params = "&to=zh-Hans";
+//                break;
+//            case "Chinese Traditional":
+//                params = "&to=zh-Hant";
+//                break;
             case "English":
                 params = "&to=en";
                 break;
@@ -113,15 +115,15 @@ public class MicrosoftTextTranslate {
             case "German":
                 params = "&to=de";
                 break;
-            case "Hindi":
-                params = "&to=hi";
-                break;
+//            case "Hindi":
+//                params = "&to=hi";
+//                break;
             case "Italian":
                 params = "&to=it";
                 break;
-            case "Russian":
-                params = "&to=ru";
-                break;
+//            case "Russian":
+//                params = "&to=ru";
+//                break;
             case "Spanish":
                 params = "&to=es";
                 break;

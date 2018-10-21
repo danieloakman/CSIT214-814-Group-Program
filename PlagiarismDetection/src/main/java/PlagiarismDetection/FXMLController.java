@@ -145,6 +145,8 @@ public class FXMLController implements Initializable {
     private ImageView checkingForPlagiarismLoadingGif;
     @FXML
     private TextArea documentSimilaritiesTextArea;
+    @FXML
+    private Label checkingForPlagiarismWaitLabel;
     
     static String errorLabel;
     static ExecutorService executor;
@@ -199,6 +201,7 @@ public class FXMLController implements Initializable {
     void checkForPlagiarismButtonAction(ActionEvent event) {
         System.out.println("Checking for plagiarism...");
         checkingForPlagiarismLoadingGif.setVisible(true);
+        checkingForPlagiarismWaitLabel.setVisible(true);
         final String textToCompare;
         if (translatedTextArea.getText().isEmpty()) // if the user didn't translate their document, this would be empty
             textToCompare = inputTextArea.getText().replaceAll("\n", " ");
@@ -209,56 +212,84 @@ public class FXMLController implements Initializable {
             @Override
             // Performs a search based on translated text:
             public void run() {
-                // Starts websearch
-                WebSearch.start(textToCompare);
-                // Adds results
-                for(int i = 0; i < WebSearch.santitizedText.size(); i += 4){
-                    // The percentage calculated from these (as of now) are how much of the search result snippet has in comparison with textToCompare
+                // Set language:
+                String language = "English";
+                if (!targetLanguageChoiceBox.getSelectionModel().isEmpty())
+                    language = targetLanguageChoiceBox.getSelectionModel().getSelectedItem().toString();
+                // Construct searchQuery from textToCompare
+                String searchQuery = textToCompare;
+                if (textToCompare.length() > 100) { // if textToCompare is larger than 100 characters, then only search by the first 100 characters:
+                    searchQuery = textToCompare.substring(0, 100);
+                }
+                // Starts websearch:
+                WebSearch.start(searchQuery);
+                for(int i = 0; i < WebSearch.santitizedText.size(); i += 3){
+                    // Add web search results to results:
                     results.add(new ResultCompare(
                             WebSearch.santitizedText.get(i),
                             WebSearch.santitizedText.get(i+1),
-                            textToCompare,
                             WebSearch.santitizedText.get(i+2),
-                            WebSearch.santitizedText.get(i+3)
+                            language
                     ));
                 }
-                // Delete any results that have 0% match
+                // The percentage calculated from these (as of now) are how much of the search result snippet has in comparison with textToCompare
+                System.out.println("Looking through the snippets of all search results.");
                 for (int i = 0; i < results.size(); i++) {
-                    if (results.get(i).percent == 0)
-                        results.remove(i);
+                    System.out.println("URL: " + results.get(i).url);
+                    results.get(i).calcPercent(results.get(i).snippet, textToCompare);
                 }
-                
-                // Sort by percent, see ResultCompare's compareTo method
-                Collections.sort(results);
-                
-                // Look through top 3 (or less) web pages with the highest comparison percentage and further compare through the whole webpage
+                // Delete any results that have near 0% match
                 for (int i = 0; i < results.size(); i++) {
+                    if (results.get(i).percent < 1) {
+                        results.remove(i);
+                        i = 0;
+                    }
+                }
+                // Sort by percent, see ResultCompare's compareTo method:
+                Collections.sort(results);
+                // Look through all web results and further compare through the whole webpage for each one:
+                System.out.println("Now looking through some webpages:");
+                for (int i = 0; i < results.size(); i++) {
+                    System.out.println("URL: " + results.get(i).url);
                     try {
                         URL webpageUrl = new URL(results.get(i).url);
-                        BufferedReader in = new BufferedReader(new InputStreamReader(webpageUrl.openStream())); 
-                        String st, webpageContents = ""; 
+                        BufferedReader in = new BufferedReader(new InputStreamReader(webpageUrl.openStream()));
+                        String st, webpageContents = "";
                         while ((st = in.readLine()) != null) {
-//                            System.out.println(st);
                             webpageContents += st;
                         }
                         in.close();
                         // Parse the raw html webpage into a usable string:
-                        Document doc = Jsoup.parse(webpageContents);
-                        System.out.println(doc.getElementsByTag("p"));
+                        webpageContents = Jsoup.parse(webpageContents).text();
                         // Get the new percentage result from the full webpage:
-                        results.get(i).percent = ResultCompare.calcPercent(webpageContents, textToCompare);
+                        results.get(i).calcPercent(webpageContents, textToCompare);
+                        results.get(i).lookedThroughWebpage = true;
+                        // If this current webpage was greater than 90% match, don't look at any other web pages:
+                        if (results.get(i).percent > 90) {
+                            break;
+                        }
                     } catch (MalformedURLException ex) {
                         System.out.println(ex);
                     } catch (IOException ex) {
                         System.out.println(ex);
                     }
                 }
-                
+                // Delete any results that have near 0% match again
+                for (int i = 0; i < results.size(); i++) {
+                    if (results.get(i).percent < 1) {
+                        results.remove(i);
+                        i = 0;
+                    }
+                }
+                // Sort the results now that some webpages have been compared:
+                Collections.sort(results);
+                // Update the UI on the normal Java FX UI thread:
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
                         // turn off loading gif
                         checkingForPlagiarismLoadingGif.setVisible(false);
+                        checkingForPlagiarismWaitLabel.setVisible(false);
                         // Change screens:
                         selectLanguageScreen.setVisible(false);
                         selectLanguageScreen.setDisable(true);
@@ -275,7 +306,7 @@ public class FXMLController implements Initializable {
                             for (int i = 0; i < results.size(); i++) {
                                 webSourcesMatchedTextArea.setText(
                                     webSourcesMatchedTextArea.getText() +
-                                    (i+1) + " - " + results.get(i).percent + "% match. " + results.get(i).toString() + "\n"
+                                    (i+1) + " - " + results.get(i).percent + "% match. " + results.get(i).toString() + "\n\n"
                                 );
                             }
                         } else { // if no search results had any similarities
@@ -331,7 +362,7 @@ public class FXMLController implements Initializable {
     void translateButtonAction(ActionEvent event) {
         translateTextErrorLabel.setText("");
         final MicrosoftTextTranslate translator = new MicrosoftTextTranslate();
-        final String text = inputTextArea.getText();
+        final String text = inputTextArea.getText().replaceAll("\n", " ");
         translateTextLoadingGif.setVisible(true);
         if (targetLanguageChoiceBox.getSelectionModel().isEmpty()) { // if there is no selected language
             translateTextErrorLabel.setText("No target language currently selected.");
@@ -631,6 +662,7 @@ public class FXMLController implements Initializable {
                         titleField.setText(file.getName().substring(0, file.getName().indexOf(".docx")));
                     } catch (Exception ex) {
                         System.out.println("Something is wrong with the .docx file.");
+                        inputScreenErrorLabel.setText("Something is wrong with this .docx file. Please use a different file.");
                     }
                 } else {
                     inputScreenErrorLabel.setText("Error, either a .docx or .txt file must be selected.");
@@ -707,17 +739,15 @@ public class FXMLController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-//        String text2 = "... England, on 13 May 1787 to found the penal colony ... of two Royal Navy vessels, three store ships and ... to Rio de Janeiro, then east to Cape Town and via ...";
-//        String text1 = "The First Fleet was the 11 ships that departed from Portsmouth, England, on 13 May 1787 to found the penal colony that became the first European settlement in Australia. The Fleet consisted of two Royal Navy vessels, three store ships and six convict transports, carrying between 1,000 and 1,500 convicts, marines, seamen, civil officers and free people (accounts differ on the numbers), and a large quantity of stores. From England, the Fleet sailed southwest to Rio de Janeiro, then east to Cape Town and via the Great Southern Ocean to Botany Bay, arriving over the period of 18 to 20 January 1788, taking 250 to 252 days from departure to final arrival. ";
-//        ResultCompare.calcPercent(text1, text2);
-        
         // Initialise and validate the connection to the Firebase API.
         Firebase.initialise();
         checkFirebaseConnection();
+        // Some of thse languages are not being used because they have different characters,
+        // that aren't being handled.
         targetLanguageChoiceBox.setItems(FXCollections.observableArrayList(
-            "Arabic", "Chinese Simplified", "Chinese Traditional",
-            "English", "French", "German", "Hindi",
-            "Italian", "Russian", "Spanish"
+            /*"Arabic", "Chinese Simplified", "Chinese Traditional",*/
+            "English", "French", "German", /*"Hindi",*/
+            "Italian", /*"Russian",*/ "Spanish"
         ));
     }
 }
