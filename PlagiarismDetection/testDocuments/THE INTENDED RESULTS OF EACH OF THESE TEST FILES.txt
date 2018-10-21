@@ -1,0 +1,4 @@
+- brokenTest.docx: Fails and gives an error message.
+- First Fleet.docx: Should give near 100% in english check.
+- isn'tPlagiarised.txt: Should give near 0% in english check.
+- Little Red Riding Hood.txt: Should give near 100% in english check.

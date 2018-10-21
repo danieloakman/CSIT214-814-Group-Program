@@ -37,8 +37,8 @@ import javafx.stage.Stage;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import java.util.Collections;
+import javafx.scene.web.WebView;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 
 public class FXMLController implements Initializable {
     @FXML
@@ -108,11 +108,7 @@ public class FXMLController implements Initializable {
     @FXML
     private Button fetchButton;
     @FXML
-    private Button searchButton;
-    @FXML
     private Button uploadButton;
-    @FXML
-    private TextArea searchTextArea;
     @FXML
     private TextArea webSourcesMatchedTextArea;
     @FXML
@@ -144,15 +140,17 @@ public class FXMLController implements Initializable {
     @FXML
     private ImageView checkingForPlagiarismLoadingGif;
     @FXML
-    private TextArea documentSimilaritiesTextArea;
+    private WebView documentSimilaritiesWebView;
     @FXML
     private Label checkingForPlagiarismWaitLabel;
     
     static String errorLabel;
     static ExecutorService executor;
     static FileChooser fileChooser;
-//    PlagiarismResults pResults = new PlagiarismResults();
-    public ArrayList<ResultCompare> results = new ArrayList<>();
+    // Plagiarism result global variables:
+    static ArrayList<ResultCompare> results = new ArrayList<>();
+    static String webStr; // web string for loading into documentSimilaritiesWebView
+    static String nextUploadedDocumentID = "";
     
     @FXML
     void mainScreenSignOutButtonAction(ActionEvent event) {
@@ -175,11 +173,6 @@ public class FXMLController implements Initializable {
     }
     
     @FXML
-    void searchButtonAction (ActionEvent event) {
-        
-    }
-
-    @FXML
     void startNewCheckButtonAction(ActionEvent event) {
         System.out.println("Starting new plagiarism check...");
         resultsScreen.setVisible(false);
@@ -191,7 +184,7 @@ public class FXMLController implements Initializable {
         translatedTextArea.clear();
         results.clear();
         webSourcesMatchedTextArea.clear();
-        documentSimilaritiesTextArea.clear();
+        documentSimilaritiesWebView.getEngine().loadContent("");
         // Empty input title and text fields:
         titleField.clear();
         inputTextArea.clear();
@@ -202,11 +195,7 @@ public class FXMLController implements Initializable {
         System.out.println("Checking for plagiarism...");
         checkingForPlagiarismLoadingGif.setVisible(true);
         checkingForPlagiarismWaitLabel.setVisible(true);
-        final String textToCompare;
-        if (translatedTextArea.getText().isEmpty()) // if the user didn't translate their document, this would be empty
-            textToCompare = inputTextArea.getText().replaceAll("\n", " ");
-        else
-            textToCompare = translatedTextArea.getText();
+        final String textToCompare = translatedTextArea.getText();
         // Run the following in a new thread:
         new Thread(new Runnable() {
             @Override
@@ -216,6 +205,8 @@ public class FXMLController implements Initializable {
                 String language = "English";
                 if (!targetLanguageChoiceBox.getSelectionModel().isEmpty())
                     language = targetLanguageChoiceBox.getSelectionModel().getSelectedItem().toString();
+                // Create wordMatches list to deep copy into all web search results:
+                ArrayList<WordMatch> wordMatches = WordMatch.createWordMatchList(textToCompare);
                 // Construct searchQuery from textToCompare
                 String searchQuery = textToCompare;
                 if (textToCompare.length() > 100) { // if textToCompare is larger than 100 characters, then only search by the first 100 characters:
@@ -229,7 +220,8 @@ public class FXMLController implements Initializable {
                             WebSearch.santitizedText.get(i),
                             WebSearch.santitizedText.get(i+1),
                             WebSearch.santitizedText.get(i+2),
-                            language
+                            language,
+                            wordMatches
                     ));
                 }
                 // The percentage calculated from these (as of now) are how much of the search result snippet has in comparison with textToCompare
@@ -237,6 +229,7 @@ public class FXMLController implements Initializable {
                 for (int i = 0; i < results.size(); i++) {
                     System.out.println("URL: " + results.get(i).url);
                     results.get(i).calcPercent(results.get(i).snippet, textToCompare);
+                    results.get(i).extraInfo = "Only looked through snippet.";
                 }
                 // Delete any results that have near 0% match
                 for (int i = 0; i < results.size(); i++) {
@@ -263,15 +256,17 @@ public class FXMLController implements Initializable {
                         webpageContents = Jsoup.parse(webpageContents).text();
                         // Get the new percentage result from the full webpage:
                         results.get(i).calcPercent(webpageContents, textToCompare);
-                        results.get(i).lookedThroughWebpage = true;
+                        results.get(i).extraInfo = "Looked though entire webpage.";
                         // If this current webpage was greater than 90% match, don't look at any other web pages:
                         if (results.get(i).percent > 90) {
                             break;
                         }
                     } catch (MalformedURLException ex) {
                         System.out.println(ex);
+                        results.get(i).extraInfo = "Could not reach webpage, only looked at snippet.\n" + ex;
                     } catch (IOException ex) {
                         System.out.println(ex);
+                        results.get(i).extraInfo = "Could not reach webpage, only looked at snippet.\n" + ex;
                     }
                 }
                 // Delete any results that have near 0% match again
@@ -283,6 +278,21 @@ public class FXMLController implements Initializable {
                 }
                 // Sort the results now that some webpages have been compared:
                 Collections.sort(results);
+                // Construct the html string for documentSimilaritiesWebView:
+                if (!results.isEmpty()) {
+                    ArrayList<WordMatch> bestWordMatches = results.get(0).wordMatches; // use the highest matched percentage result
+                    webStr = "<p>";
+                    for (WordMatch wm : bestWordMatches) {
+                        if (wm.matched) { // if this word was matched in this result, then highlight it.
+                            webStr += "<mark>" + wm.word + " </mark>";
+                        } else { // if it wasn't matched then don't highlight it.
+                            webStr += wm.word + " ";
+                        }
+                    }
+                    webStr += "</p>";
+                }
+                // Store the highest plagiarised percentage in the database for this document that was just uploaded:
+                Firebase.storePlagiarisedPercentageOfLastUploadedDocument(results.get(0).percent);
                 // Update the UI on the normal Java FX UI thread:
                 Platform.runLater(new Runnable() {
                     @Override
@@ -299,10 +309,10 @@ public class FXMLController implements Initializable {
                         resultsScreen.setDisable(false);
                         // shows results in UI
                         if (!results.isEmpty()) {
-                            highestMatchedPercentageLabel.setText("Highest match: " + Double.toString(Math.round(results.get(0).percent)) + "%");
+                            highestMatchedPercentageLabel.setText("Highest plagiarism match: " + Double.toString(Math.round(results.get(0).percent)) + "%");
                             uniquePercentageLabel.setText("Unique: " + Double.toString(Math.round(100 - results.get(0).percent)) + "%");
                             numberOfMatchesLabel.setText("Number of matches: " + Integer.toString(results.size()));
-                            documentSimilaritiesTextArea.setText(textToCompare);
+                            documentSimilaritiesWebView.getEngine().loadContent(webStr); // load the similarities view with the 
                             for (int i = 0; i < results.size(); i++) {
                                 webSourcesMatchedTextArea.setText(
                                     webSourcesMatchedTextArea.getText() +
@@ -310,10 +320,10 @@ public class FXMLController implements Initializable {
                                 );
                             }
                         } else { // if no search results had any similarities
-                            highestMatchedPercentageLabel.setText("Highest match: 0%");
+                            highestMatchedPercentageLabel.setText("Highest plagiarism match: 0%");
                             uniquePercentageLabel.setText("Unique: 100%");
                             numberOfMatchesLabel.setText("Number of matches: 0");
-                            documentSimilaritiesTextArea.setText(textToCompare);
+                            documentSimilaritiesWebView.getEngine().loadContent(textToCompare);
                             webSourcesMatchedTextArea.setText("No similar articles found on the web.");
                         }
                     }
@@ -352,6 +362,10 @@ public class FXMLController implements Initializable {
                         uploadDocumentLoadingGif.setVisible(false);
                         // Allow user to access translate screen:
                         selectLanguageScreen.setDisable(false);
+                        // Disable access to input UI elements
+                        inputScreen.setDisable(true);
+                        // Transfer text to translatedTextArea
+                        translatedTextArea.setText(inputTextArea.getText().replaceAll("\n", " "));
                     }
                 });
             }
@@ -661,7 +675,7 @@ public class FXMLController implements Initializable {
                         inputTextArea.setText(fileText);
                         titleField.setText(file.getName().substring(0, file.getName().indexOf(".docx")));
                     } catch (Exception ex) {
-                        System.out.println("Something is wrong with the .docx file.");
+                        System.out.println("Something is wrong with the .docx file: " + ex);
                         inputScreenErrorLabel.setText("Something is wrong with this .docx file. Please use a different file.");
                     }
                 } else {

@@ -17,6 +17,7 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.cloud.firestore.SetOptions;
+import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
@@ -38,6 +39,7 @@ public class Firebase {
     static public boolean isInitialised = false;
     static public User currentUser = new User();
     static public boolean loggedIn = false;
+    static public String lastUploadedDocumentID = "";
     
     /*
      *  Initialises the Firebase API. Returns true if successfully initialised, else returns false.
@@ -199,7 +201,8 @@ public class Firebase {
             documentMap.put(addedDocRef.get().getId(), title);
             uploadedDocuments.put("uploadedDocuments", documentMap);
             db.collection("Users").document(nameOfUploader).set(uploadedDocuments, SetOptions.merge());
-            System.out.println("Added document with ID: " + addedDocRef.get().getId());
+            System.out.println("Uploaded document with ID: " + addedDocRef.get().getId());
+            lastUploadedDocumentID = addedDocRef.get().getId();
         } catch (InterruptedException | ExecutionException ex) {
             Logger.getLogger(Firebase.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -235,6 +238,19 @@ public class Firebase {
         for (QueryDocumentSnapshot document : documents) {
             System.out.println(document.getId());
             System.out.println(document.getData());
+        }
+    }
+    
+    static public void storePlagiarisedPercentageOfLastUploadedDocument (double percent) {
+        System.out.println("calling storePlagiarisedPercentageOfLastUploadedDocument()");
+        DocumentReference docRef = db.collection("Documents").document(lastUploadedDocumentID);
+        ApiFuture<WriteResult> future = docRef.update("plagiarisedPercentage", percent);
+        WriteResult result;
+        try {
+            result = future.get();
+            System.out.println("Successfully updated document " + lastUploadedDocumentID + " with percentage " + percent);
+        } catch (InterruptedException | ExecutionException ex) {
+            System.out.println("Could not update plagiarisedPercentage, " + ex);
         }
     }
 }

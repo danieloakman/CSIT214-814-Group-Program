@@ -4,6 +4,7 @@
 
 package PlagiarismDetection;
 
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 
@@ -13,71 +14,67 @@ public class ResultCompare implements Comparable<ResultCompare>{
     public double percent;
     public String url;
     public String language;
-    public String webpage; // the full webpage
-    public boolean lookedThroughWebpage;
-    int[] trueComparedIndices;
+//    public String webpage; // the full webpage
+    public String extraInfo; // E.G. "Looked through whole webpage", "Couldn't load web page, just looked at snippet", etc
+    ArrayList<WordMatch> wordMatches; // This is the text that we are trying to find, seperated into WordMatch objects
+    public static Pattern punctuation = Pattern.compile("(,|\\.|\\!|:|;|\\?|\\\\|\\/|\\(|\\)|\\[|\\]|'|\"|@|\\+|\\-|_|=|\\*|©|\\{|\\})"); // matches any punctuation
     
-    ResultCompare(String title, String snippet, String url, String language){
+    ResultCompare(String title, String snippet, String url, String language, ArrayList<WordMatch> wordMatches){
         this.snippet = snippet;
         this.title = title;
         this.url = url;
         this.language = language;
         this.percent = 0;
-        this.lookedThroughWebpage = false;
+        this.extraInfo = "";
+        this.wordMatches = new ArrayList<>();
+        for (WordMatch wm: wordMatches) { // deep copy wordMatches:
+            this.wordMatches.add(wm);
+        }
     }
     
     public double calcPercent(String content, String comparativeContent){
-        double percentContent = 0;
         System.out.println("called calcPercent()...");
+        WordMatch.setMatches(wordMatches, false); // clear all previous matches:
+        double percentContent = 0;
         // If content or comparativeContent can be found inside the other.
         if (content.contains(comparativeContent) || comparativeContent.contains(content)) {
+            WordMatch.setMatches(wordMatches, true);
             percent = 100;
             return 100;
         }
-        Pattern punctuation = Pattern.compile("(,|\\.|\\!|:|;|\\?|\\\\|\\/|\\(|\\)|\\[|\\]|'|\"|@|\\+|\\-|_|=|\\*|©|\\{|\\})"); // matches any punctuation
         String contentLC; // content in lower case and without punctuation
         String compContentLC; // comparative content in lower case and without punctuation
-//        if (language.matches("English")) { // only take away punctuation if the language is English
-            contentLC = content.replaceAll(punctuation.toString(), "").toLowerCase();
-            compContentLC = comparativeContent.replaceAll(punctuation.toString(), "").toLowerCase();
-//        } else { // any other language but English, just convert all characters to lowerCase.
-//            contentLC = content;//.toLowerCase();
-//            compContentLC = comparativeContent;//.toLowerCase();
-//        }
+        contentLC = content.replaceAll(punctuation.toString(), "").toLowerCase();
+        compContentLC = comparativeContent.replaceAll(punctuation.toString(), "").toLowerCase();
         String[] contentWords = contentLC.trim().split(" ");
-        String[] compContentWords = compContentLC.trim().split(" ");
+//        String[] compContentWords = compContentLC.trim().split(" ");
         // Now with both contents having been filtered for punctuation and converted to lowercase,
         // Check again if one contains the other:
         if (contentLC.contains(compContentLC) || compContentLC.contains(contentLC)) {
+            WordMatch.setMatches(wordMatches, true);
             percent = 100;
             return 100;
         }
         int numberOfMatches = 0;
-        // Look for compContentWords in contentWords
-        trueComparedIndices = new int[compContentWords.length];
+        // Look for each wordMatches.wordEdited in contentWords
         try {
-            for (int i = 0; i < compContentWords.length; i++) {
+            for (int i = 0; i < wordMatches.size(); i++) {
                 for (int j = 0; j < contentWords.length; j++) {
                     int count = 0; // number of words matched in a row
                     int i2 = i, j2 = j;
-//                    System.out.println(i2 + ": " + compContentWords[i2] + " == " + contentWords[j2] + " :" + j2);
-                    while (compContentWords[i2].matches(contentWords[j2])) {
-//                        System.out.println(i2 + ": " + compContentWords[i2] + " == " + contentWords[j2] + " :" + j2);
+                    while (wordMatches.get(i2).wordEdited.matches(contentWords[j2])) {
                         // Keep looping in here while next words match each other.
                         count++; // count the number of matched words
                         i2++;
                         j2++;
-                        if (i2 >= compContentWords.length || j2 >= contentWords.length) // if either index went past array bounds
+                        if (i2 >= wordMatches.size() || j2 >= contentWords.length) // if either index went past array bounds
                             break;
                     }
                     // if the number of matched words in a row was 3 or more, then mark those words as matched in trueComparedIndices.
                     if (count >= 3) {
-//                        System.out.println(count + " words found in a row.\nThese words were found: ");
                         for (int k = 0; k < count; k++) {
-                            trueComparedIndices[i+k] = 1;
-//                            System.out.print(compContentWords[i+k] + " ");
+                            wordMatches.get(i+k).matched = true;
                         }
-//                        System.out.println();
                         i += count-1; // increment i by the number of matched words, because there is no longer any need to compare them again
                     }
                 }
@@ -85,12 +82,12 @@ public class ResultCompare implements Comparable<ResultCompare>{
         } catch (Exception ex) {
             System.out.println(ex);
         } 
-        for (int n : trueComparedIndices) {
-            if (n == 1) {
+        for (WordMatch n : wordMatches) {
+            if (n.matched) {
                 numberOfMatches++;
             }
         }
-        percentContent = Math.round(((double)numberOfMatches / (double)trueComparedIndices.length) * 100);
+        percentContent = Math.round(((double)numberOfMatches / (double)wordMatches.size()) * 100);
         System.out.println("Percentage of content found: " + percentContent);
         
         percent = percentContent;
@@ -99,13 +96,7 @@ public class ResultCompare implements Comparable<ResultCompare>{
     
     @Override
     public String toString(){
-        String temp = title + "\n" + snippet + "\n" + url + "\n";
-        if (lookedThroughWebpage) {
-            temp += "Looked through whole webpage.";
-        } else {
-            temp += "Only looked through snippet.";
-        }
-        return temp;
+        return title + "\n" + snippet + "\n" + url + "\n" + extraInfo;
     }
     
     // sorts array list by percentage match
@@ -117,6 +108,44 @@ public class ResultCompare implements Comparable<ResultCompare>{
             return -1;
         } else {
             return 0;
+        }
+    }
+    
+    
+}
+
+/*
+ *  Store a word
+ */
+class WordMatch {
+    public String word; // normal word
+    public String wordEdited; // word as lower case, no punctuation
+    public boolean matched; // whether this was matched to a word in this web result
+    public WordMatch(String word, String wordEdited) {
+        this.matched = false;
+        this.word = word;
+        this.wordEdited = wordEdited;
+    }
+    
+    /*
+     *  Returns a WordMatch Arraylist from a string.
+     */
+    public static ArrayList<WordMatch> createWordMatchList (String text) {
+        String[] nonEditedWords = text.split(" ");
+        ArrayList<WordMatch> wordMatches = new ArrayList<>();
+        for (String str : nonEditedWords) {
+            String strEdited = str.replaceAll(ResultCompare.punctuation.toString(), "").toLowerCase().trim();
+            wordMatches.add(new WordMatch(str, strEdited));
+        }
+        return wordMatches;
+    }
+    
+    /*
+     *  Sets all words in a WordMatch array list to the matched value of bool.
+     */
+    public static void setMatches(ArrayList<WordMatch> wordMatches, boolean bool) {
+        for (int i = 0; i < wordMatches.size(); i++) {
+            wordMatches.get(i).matched = bool;
         }
     }
 }
