@@ -1,5 +1,5 @@
 /*
- * CSIT214/814 GROUP ALPHA
+ *  CSIT214/814 GROUP ALPHA
  */
 
 package PlagiarismDetection;
@@ -144,13 +144,14 @@ public class FXMLController implements Initializable {
     @FXML
     private Label checkingForPlagiarismWaitLabel;
     
+    // Global Variables:
     static String errorLabel;
     static ExecutorService executor;
     static FileChooser fileChooser;
+    static String nextUploadedDocumentID = "";
     // Plagiarism result global variables:
     static ArrayList<ResultCompare> results = new ArrayList<>();
     static String webStr; // web string for loading into documentSimilaritiesWebView
-    static String nextUploadedDocumentID = "";
     
     @FXML
     void mainScreenSignOutButtonAction(ActionEvent event) {
@@ -175,6 +176,7 @@ public class FXMLController implements Initializable {
     @FXML
     void startNewCheckButtonAction(ActionEvent event) {
         System.out.println("Starting new plagiarism check...");
+        // change screens:
         resultsScreen.setVisible(false);
         resultsScreen.setDisable(true);
         selectLanguageScreen.setVisible(true);
@@ -193,9 +195,13 @@ public class FXMLController implements Initializable {
     @FXML
     void checkForPlagiarismButtonAction(ActionEvent event) {
         System.out.println("Checking for plagiarism...");
-        checkingForPlagiarismLoadingGif.setVisible(true);
-        checkingForPlagiarismWaitLabel.setVisible(true);
+        checkingForPlagiarismLoadingGif.setVisible(true); // show the loading gif
+        checkingForPlagiarismWaitLabel.setVisible(true); // show the "this may take some time"
         final String textToCompare = translatedTextArea.getText();
+        // Disable buttons while processing:
+        checkForPlagiarismButton.setDisable(true);
+        translateButton.setDisable(true);
+        targetLanguageChoiceBox.setDisable(true);
         // Run the following in a new thread:
         new Thread(new Runnable() {
             @Override
@@ -292,11 +298,15 @@ public class FXMLController implements Initializable {
                     webStr += "</p>";
                 }
                 // Store the highest plagiarised percentage in the database for this document that was just uploaded:
-                Firebase.storePlagiarisedPercentageOfLastUploadedDocument(results.get(0).percent);
+                Firebase.storeResultInfoOfLastUploadedDocument(results.get(0).percent, language);
                 // Update the UI on the normal Java FX UI thread:
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
+                        // re-enable buttons:
+                        checkForPlagiarismButton.setDisable(false);
+                        translateButton.setDisable(false);
+                        targetLanguageChoiceBox.setDisable(false);
                         // turn off loading gif
                         checkingForPlagiarismLoadingGif.setVisible(false);
                         checkingForPlagiarismWaitLabel.setVisible(false);
@@ -334,7 +344,7 @@ public class FXMLController implements Initializable {
     }
     
     /*
-     *  upload document to database and link to currently logged in user
+     *  Upload document to database and link to currently logged in user
      */
     @FXML
     void uploadButtonAction(ActionEvent event) {
@@ -349,6 +359,11 @@ public class FXMLController implements Initializable {
             uploadDocumentLoadingGif.setVisible(false);
             return;
         }
+        // Disable some UI while processing:
+        browseForAFileButton.setDisable(true);
+        uploadButton.setDisable(true);
+        titleField.setEditable(false);
+        inputTextArea.setEditable(false);
         // Run the following in a new thread:
         new Thread(new Runnable() {
             @Override
@@ -359,6 +374,12 @@ public class FXMLController implements Initializable {
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
+                        // Re-enable UI
+                        browseForAFileButton.setDisable(false);
+                        uploadButton.setDisable(false);
+                        titleField.setEditable(true);
+                        inputTextArea.setEditable(true);
+                        // stop loading gif
                         uploadDocumentLoadingGif.setVisible(false);
                         // Allow user to access translate screen:
                         selectLanguageScreen.setDisable(false);
@@ -372,33 +393,52 @@ public class FXMLController implements Initializable {
         }).start();
     }
     
+    /*
+     *  Translates the text in inputTextArea to a selected language from the
+     *  targetLanguageChoiceBox.
+     */
     @FXML
     void translateButtonAction(ActionEvent event) {
         translateTextErrorLabel.setText("");
+        // create a MicrosoftTextTranslate object:
         final MicrosoftTextTranslate translator = new MicrosoftTextTranslate();
+        // get the text that is to be translated:
         final String text = inputTextArea.getText().replaceAll("\n", " ");
+        // show the loading gif:
         translateTextLoadingGif.setVisible(true);
+        // check if there is no selected language:
         if (targetLanguageChoiceBox.getSelectionModel().isEmpty()) { // if there is no selected language
             translateTextErrorLabel.setText("No target language currently selected.");
             System.out.println("No target language currently selected.");
             translateTextLoadingGif.setVisible(false);
             return;
         }
+        // set the translation language to be what is selected in targetLanguageChoiceBox:
         translator.setParams(targetLanguageChoiceBox.getValue().toString());
         System.out.println("Target language: " + targetLanguageChoiceBox.getValue().toString());
+        // disable buttons while processing:
+        translateButton.setDisable(true);
+        checkForPlagiarismButton.setDisable(true);
+        targetLanguageChoiceBox.setDisable(true);
         // Run the following in a new thread:
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
+                    // Do the translation
                     translator.translateAString(text);
                 } catch (Exception ex) {
-                    // maybe add some set error label messages here to say what level error it was, i.e. 400, 401, etc, and their descriptions
-                    System.out.println(ex.getMessage());
+                    System.out.println("translate text error: " + ex);
                 }
+                // Run this in the Java FX UI thread:
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
+                        // re-enable buttons:
+                        translateButton.setDisable(false);
+                        checkForPlagiarismButton.setDisable(false);
+                        targetLanguageChoiceBox.setDisable(false);
+                        // stop loading gif
                         translateTextLoadingGif.setVisible(false);
                         // only set text area if translation was successful
                         if (!translator.translatedText.isEmpty()) {
@@ -415,6 +455,9 @@ public class FXMLController implements Initializable {
         }).start();
     }
     
+    /*
+     *  test/debug function
+     */
     @FXML
     void debugButtonAction(ActionEvent event) {
         System.out.println("Debug/test screen...");
@@ -424,6 +467,9 @@ public class FXMLController implements Initializable {
         debugTestScreen.setVisible(true);
     }
 
+    /*
+     *  test/debug function
+     */
     @FXML
     void exitDebugAction(ActionEvent event) {
         System.out.println("Exiting debug/test screen...");
@@ -433,6 +479,9 @@ public class FXMLController implements Initializable {
         mainScreen.setVisible(true);
     }
     
+    /*
+     *  test/debug function
+     */
     @FXML
     void fetchButtonAction(ActionEvent event) {
         System.out.println("Fetching all documents from database...");
@@ -473,6 +522,9 @@ public class FXMLController implements Initializable {
         accountLogInOrSignUpPane.setVisible(true);
     }
     
+    /*
+     *  Signs the user in with an email and password.
+     */
     @FXML
     void signInButtonAction(ActionEvent event) {
         // turn on the loading gif
@@ -501,7 +553,11 @@ public class FXMLController implements Initializable {
             signInLoadingGif.setVisible(false);
             return;
         }
-        
+        // disable access to ui while processing
+        signInBackButton.setDisable(true);
+        signInEmailField.setDisable(true);
+        signInPasswordField.setDisable(true);
+        signInButton.setDisable(true);
         // run Firebase fetching processes on another thread:
         new Thread(new Runnable() {
             @Override
@@ -528,9 +584,16 @@ public class FXMLController implements Initializable {
                     System.out.println("Error, no user was found with that email.");
                 }
                 
+                // Run this on the normal Java FX UI thread.
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
+                        // re-enable UI buttons:
+                        signInBackButton.setDisable(false);
+                        signInEmailField.setDisable(false);
+                        signInPasswordField.setDisable(false);
+                        signInButton.setDisable(false);
+                        // set error label:
                         signInErrorLabel.setText(errorLabel);
                         if (Firebase.loggedIn) {
                             // Logged user in successfully.
@@ -557,6 +620,9 @@ public class FXMLController implements Initializable {
         }).start();
     }
     
+    /*
+     *  Creates a firebase account and signs this newly created user in.
+     */
     @FXML
     void createAccountButtonAction(ActionEvent event) {
         createAccountLoadingGif.setVisible(true); // turn on the loading gif
@@ -586,6 +652,11 @@ public class FXMLController implements Initializable {
             createAccountLoadingGif.setVisible(false);
             return;
         }
+        // Disable access to UI while processing:
+        createAccountBackButton.setDisable(true);
+        createAccountButton.setDisable(true);
+        createAccountEmailField.setDisable(true);
+        createAccountPasswordField.setDisable(true);
         // run Firebase processes on a new thread:
         new Thread(new Runnable() {
             @Override
@@ -611,6 +682,12 @@ public class FXMLController implements Initializable {
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
+                        // re-enable UI buttons:
+                        createAccountBackButton.setDisable(false);
+                        createAccountButton.setDisable(false);
+                        createAccountEmailField.setDisable(false);
+                        createAccountPasswordField.setDisable(false);
+                        // set error label:
                         createAccountErrorLabel.setText(errorLabel);
                         if (errorLabel.isEmpty()) { // If there was no errors, meaning it was a successful account creation attempt
                             createAccountErrorLabel.setText("");
@@ -637,8 +714,15 @@ public class FXMLController implements Initializable {
         }).start();
     }
     
+    /*
+     *  Opens a file explorer to allow the user to pick a .docx or .txt file.
+     *  The contents and name of the file are automatically placed inside the 
+     *  title input and text input fields.
+     */
     @FXML
     void browseForAFileButtonAction(ActionEvent event) {
+        // disable input screen:
+        inputScreen.setDisable(true);
         inputScreenErrorLabel.setText("");
         fileChooser = new FileChooser();
         Stage stage = new Stage();
@@ -660,7 +744,6 @@ public class FXMLController implements Initializable {
                     System.out.println("fileText: " + fileText);
                     inputTextArea.setText(fileText);
                     titleField.setText(file.getName().substring(0, file.getName().indexOf(".txt")));
-//                    filePathTextField.setText(file.getAbsolutePath());
                 } else if (file.getName().matches(".+.docx")) { // matches [anyCharacters].docx
                     // read from the .docx file and store in the relevant text fields and areas:
                     FileInputStream in;
@@ -688,8 +771,17 @@ public class FXMLController implements Initializable {
         } else {
             System.out.println("No file was selected.");
         }
+        // Re-enable input screen:
+        inputScreen.setDisable(false);
     }
     
+    /*
+     *  This sends a test connection to retrieve info about user "test@test.com".
+     *  If this fails, then don't allow the user to continue in the program, and 
+     *  show an error message. This has a timeout of 5 seconds, so after 5 seconds,
+     *  it's deemed that the connection with Firebase isn't valid. Because it should be
+     *  less than a second for this function in normal operation.
+     */
     void checkFirebaseConnection () {
         System.out.println("called checkFirebaseConnection()");
         executor = Executors.newSingleThreadExecutor(); // assign a new thread to executor
@@ -751,12 +843,16 @@ public class FXMLController implements Initializable {
         }).start();
     }
     
+    /*
+     *  This is called before any UI is loaded or shown.
+     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // Initialise and validate the connection to the Firebase API.
         Firebase.initialise();
         checkFirebaseConnection();
-        // Some of thse languages are not being used because they have different characters,
+        // Assign languages to targetLanguageChoiceBox:
+        // Note: some of these languages are not being used because they have different characters,
         // that aren't being handled.
         targetLanguageChoiceBox.setItems(FXCollections.observableArrayList(
             /*"Arabic", "Chinese Simplified", "Chinese Traditional",*/
@@ -766,6 +862,11 @@ public class FXMLController implements Initializable {
     }
 }
 
+/*
+ *  Abstract class that can be overriden to allow for running methods in a new thread,
+ *  but have that new thread be stopped after a certain amount of time has elapsed,
+ *  i.e. a timeout.
+ */
 abstract class timeoutRunnable implements Callable<Boolean> {
     @Override
     abstract public Boolean call() throws Exception;

@@ -1,7 +1,7 @@
 package PlagiarismDetection;
 
 /*
- * CSIT214/814 GROUP ALPHA
+ *  CSIT214/814 GROUP ALPHA
  */
 
 import java.io.*;
@@ -60,7 +60,7 @@ public class MicrosoftTextTranslate {
      *  Most of this was not written by the team, only changed the return type to void.
      *  Source: https://docs.microsoft.com/en-us/azure/cognitive-services/translator/quickstart-java-translate
      *
-     *  Sets internal class attribute called translatedText to be the translation of text parameter.
+     *  Sets internal class attribute called translatedText to be the translation of "text" parameter.
      */
     public void translateAString (String text) throws Exception {
         URL url = new URL (HOST + PATH + params);

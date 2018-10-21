@@ -1,5 +1,5 @@
 /*
- * CSIT214/814 GROUP ALPHA
+ *  CSIT214/814 GROUP ALPHA
  */
 
 package PlagiarismDetection;
@@ -60,36 +60,6 @@ public class Firebase {
             System.err.println("Firebase.initialise() error: " + ex.getMessage());
         }
     }
-    
-    /*
-    *   Tests/validates the connection to Firebase by attempting to get a user by a known email
-    *   should should always be in the system.
-    */
-    /*static public void validateConnectionToFirebase () {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                this.
-                try {
-                    UserRecord user = getUserByEmail("test@test.com");
-                    if (user != null) // if the user was found
-                        isInitialised = true;
-                    else // if the user wasn't found
-                        isInitialised = true;
-                } catch (InterruptedException | ExecutionException ex) {
-                    // if an exception occurred with the test, then also return false
-                    isInitialised = false;
-                }
-                
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        
-                    }
-                });
-            }
-        }).start();
-    }*/
     
     static public void createUserWithEmailAndPassword (String email, String password) throws InterruptedException, ExecutionException {
         String uid = email.substring(0, email.indexOf("@")); // johnsmith@gmail.com becomes uid = johnsmith
@@ -189,7 +159,7 @@ public class Firebase {
     
     static public void storeDocumentInDatabase (String documentText, String nameOfUploader, String title) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(); // get a timestamp that is set to the present
         FirebaseDocument doc = new FirebaseDocument(title, dtf.format(now), documentText, nameOfUploader);
         // Store doc in folder "Documents" in the database
         ApiFuture<DocumentReference> addedDocRef = db.collection("Documents").add(doc);
@@ -209,8 +179,8 @@ public class Firebase {
     }
     
     /*
-    *   Set the user's password to the new parameter "password" in the database.
-    */
+     *  Set the user's password to the new parameter "password" in the database.
+     */
     static public void setPasswordInDatabase (String email, String password) {
         HashMap<String, String> data = new HashMap<>();
         data.put("password", password);
@@ -218,13 +188,19 @@ public class Firebase {
         System.out.println("Successfully set email and password in database.");
     }
     
+    /*
+     *  Grants or revokes a user's admin status.
+     */
     static public void setAdmin (String email, boolean adminStatus) {
         HashMap<String, Boolean> data = new HashMap<>();
         data.put("admin", adminStatus);
         db.collection("Users").document(email).set(data);
-        System.out.println("Successfully set admin status for user: " + email + ".");
+        System.out.println("Successfully set admin status " + adminStatus + " for user: " + email + ".");
     }
     
+    /*
+     *  test/debug function
+     */
     static public void getAllDocumentsFromDatabase () {
         // asynchronously retrieve all documents
         ApiFuture<QuerySnapshot> future = db.collection("Documents").get();
@@ -241,13 +217,21 @@ public class Firebase {
         }
     }
     
-    static public void storePlagiarisedPercentageOfLastUploadedDocument (double percent) {
+    /*
+     *  Updates the last uploaded document's plagiarisedPercentage to a new value "percent".
+     *  Also stores the language that it was searched in.
+     */
+    static public void storeResultInfoOfLastUploadedDocument (double percent, String language) {
         System.out.println("calling storePlagiarisedPercentageOfLastUploadedDocument()");
         DocumentReference docRef = db.collection("Documents").document(lastUploadedDocumentID);
-        ApiFuture<WriteResult> future = docRef.update("plagiarisedPercentage", percent);
+        ApiFuture<WriteResult> future1 = docRef.update("plagiarisedPercentage", percent);
+        ApiFuture<WriteResult> future2 = docRef.update("searchedLanguage", language);
         WriteResult result;
         try {
-            result = future.get();
+            result = future1.get();
+            System.out.println("plagiarisedPercentage: " + result);
+            result = future2.get();
+            System.out.println("searchedLanguage: " + result);
             System.out.println("Successfully updated document " + lastUploadedDocumentID + " with percentage " + percent);
         } catch (InterruptedException | ExecutionException ex) {
             System.out.println("Could not update plagiarisedPercentage, " + ex);
@@ -255,6 +239,9 @@ public class Firebase {
     }
 }
 
+/*
+ *  Data structure for storing documents in Firebase
+ */
 class FirebaseDocument {
     public String timeOfUpload;
     public String text;
@@ -269,6 +256,9 @@ class FirebaseDocument {
     }
 }
 
+/*
+ *  Data structure for storing users in Firebase
+ */
 class User {
     public String email;
     public String password;

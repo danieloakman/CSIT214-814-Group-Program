@@ -1,5 +1,5 @@
 /*
- * CSIT214/814 GROUP ALPHA
+ *  CSIT214/814 GROUP ALPHA
  */
 
 package PlagiarismDetection;
@@ -14,10 +14,10 @@ public class ResultCompare implements Comparable<ResultCompare>{
     public double percent;
     public String url;
     public String language;
-//    public String webpage; // the full webpage
     public String extraInfo; // E.G. "Looked through whole webpage", "Couldn't load web page, just looked at snippet", etc
     ArrayList<WordMatch> wordMatches; // This is the text that we are trying to find, seperated into WordMatch objects
-    public static Pattern punctuation = Pattern.compile("(,|\\.|\\!|:|;|\\?|\\\\|\\/|\\(|\\)|\\[|\\]|'|\"|@|\\+|\\-|_|=|\\*|©|\\{|\\})"); // matches any punctuation
+    public static Pattern punctuation = // matches any punctuation
+        Pattern.compile("(,|\\.|\\!|:|;|\\?|\\\\|\\/|\\(|\\)|\\[|\\]|'|\"|@|\\+|\\-|_|=|\\*|©|\\{|\\})"); 
     
     ResultCompare(String title, String snippet, String url, String language, ArrayList<WordMatch> wordMatches){
         this.snippet = snippet;
@@ -32,6 +32,18 @@ public class ResultCompare implements Comparable<ResultCompare>{
         }
     }
     
+    /*
+     *  Searches through content for what's in comparativeContent and all the words in wordMatches.
+     *  First checks if content or comparativeContent contains the other, meaning, one has an exact
+     *  copy of the other inside it. If true then retuns 100% match.
+     *      If this fails, then it proceeds to look for any occurence of 3 or more words in wordMatches
+     *  inside of content. For example: 
+     *  content = "The duck went quack and the cow went moo", 
+     *  wordMatches = ["The", "duck", "went", "quack", "then", "the", "cow", "went", "meow"],
+     *  matches =      true    true    true    true     false   true  true    true   false.
+     *  Its important to note that if the series of matches: "the cow went" was one less word shorter
+     *  then it wouldn't have matched.
+     */
     public double calcPercent(String content, String comparativeContent){
         System.out.println("called calcPercent()...");
         WordMatch.setMatches(wordMatches, false); // clear all previous matches:
@@ -47,7 +59,6 @@ public class ResultCompare implements Comparable<ResultCompare>{
         contentLC = content.replaceAll(punctuation.toString(), "").toLowerCase();
         compContentLC = comparativeContent.replaceAll(punctuation.toString(), "").toLowerCase();
         String[] contentWords = contentLC.trim().split(" ");
-//        String[] compContentWords = compContentLC.trim().split(" ");
         // Now with both contents having been filtered for punctuation and converted to lowercase,
         // Check again if one contains the other:
         if (contentLC.contains(compContentLC) || compContentLC.contains(contentLC)) {
@@ -81,12 +92,14 @@ public class ResultCompare implements Comparable<ResultCompare>{
             }
         } catch (Exception ex) {
             System.out.println(ex);
-        } 
+        }
+        // count the number of matches in wordMatches:
         for (WordMatch n : wordMatches) {
             if (n.matched) {
                 numberOfMatches++;
             }
         }
+        // Calculate the percentContent:
         percentContent = Math.round(((double)numberOfMatches / (double)wordMatches.size()) * 100);
         System.out.println("Percentage of content found: " + percentContent);
         
@@ -99,7 +112,9 @@ public class ResultCompare implements Comparable<ResultCompare>{
         return title + "\n" + snippet + "\n" + url + "\n" + extraInfo;
     }
     
-    // sorts array list by percentage match
+    /*
+     *  sorts array list by percentage match
+     */
     @Override
     public int compareTo(ResultCompare C){
         if(this.percent < C.percent){
@@ -110,8 +125,6 @@ public class ResultCompare implements Comparable<ResultCompare>{
             return 0;
         }
     }
-    
-    
 }
 
 /*

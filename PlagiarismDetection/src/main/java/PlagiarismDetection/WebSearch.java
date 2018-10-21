@@ -1,5 +1,5 @@
 /*
- * CSIT214/814 GROUP ALPHA
+ *  CSIT214/814 GROUP ALPHA
  */
 
 package PlagiarismDetection;
@@ -8,8 +8,6 @@ import java.net.*;
 import java.util.*;
 import java.io.*;
 import javax.net.ssl.HttpsURLConnection;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonArray;
@@ -85,12 +83,4 @@ public class WebSearch {
             System.exit(1);
         }
     }
-    
-//    static public String getLanguage(String str) {
-//        switch(str) {
-//            case "":
-//                return 
-//            case "English":
-//        }
-//    }
 }
