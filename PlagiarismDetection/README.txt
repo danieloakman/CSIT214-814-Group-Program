@@ -42,4 +42,5 @@ to the debug screen (top right corner of the screen, there will be the debug/tes
 	- If you wish to see the Firebase console, please send an email to Daniel at djo307@uowmail.edu.au (with a gmail account)
 and he will give you viewing and editing rights to it. On the Firebase console you can see all stored documents and users in realtime
 so it may be of interest for marking.
+	- Here is the link to our git repository if you wish to see it: https://github.com/danieloakman/CSIT214-814-Group-Program/tree/master
 
