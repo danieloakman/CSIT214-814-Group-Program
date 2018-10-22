@@ -1,4 +1,7 @@
 - brokenTest.docx: Fails and gives an error message.
-- First Fleet.docx: Should give near 100% in english check.
+- First Fleet.docx: Should give near 100% in english check. This was straight copied from wikipedia and not edited.
 - isn'tPlagiarised.txt: Should give near 0% in english check.
-- Little Red Riding Hood.txt: Should give near 100% in english check.
+- ISS.txt: Should give near 100% in english check. This was slightly edited from wikipedia.
+- Little Red Riding Hood.txt: Should give near 100% in english check. This was straight copied from https://www.dltk-teach.com/rhymes/littlered/1.htm and not edited.
+	- German version should get ~30%
+	- Spanish version should get ~30%
