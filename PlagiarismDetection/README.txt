@@ -27,14 +27,15 @@ the source code and debug it, it will work just fine.
 	- Double click the PlagiarismDetection-x.x.jar to open the program WITHOUT console remaining on the screen.
 	- Open "RunDebug.bat" to open the program WITH console remaining on the screen.
 *NOTE: 
-	- Make sure to have the serviceAccountKey.json in the same folder as the jar and the .bat file.
+	- MAKE SURE TO HAVE THE serviceAccountKey.json in the same folder as the jar and the .bat file.
 	- Make sure that if you're using RunDebug.bat, that the name of the jar is correct. Just edit it if it's not.
 So: java -jar whateverName.jar matches the jar you're trying to open.
 
 
  - EXTRA NOTES:
 	- We have also included all .jar files that were made at different points of the program's development, this 
-can be found in the folder "Program Executables". Also included are screenshots of the Firebase firestore and users authentication screens,
+can be found in the folder "Program Executables". 
+	- Also included are screenshots of the Firebase firestore(the database) and users authentication screens,
 which is in the "Firebase console pictures" folder.
 	- There is an admin user that can be used for marking, email: test@test.com, password: test123. Admin users are given access
 to the debug screen (top right corner of the screen, there will be the debug/test button).
